@@ -254,11 +254,11 @@ def generate_speech(text, timestamp) :
         tts.save(outfile)
         print(outfile)
         print(wavfile)
-        linux_folder = "/home/mhilmiasyrofi/Documents/test-case-generation/"
+        linux_folder = "/home/mhilmiasyrofi/Documents/cross-asr/"
         if os.path.exists(linux_folder):
-            os.system('ffmpeg -i /home/mhilmiasyrofi/Documents/test-case-generation/' + outfile + ' -acodec pcm_s16le -ac 1 -ar 16000 /home/mhilmiasyrofi/Documents/test-case-generation/' + wavfile + ' -y')
+            os.system('ffmpeg -i /home/mhilmiasyrofi/Documents/cross-asr/' + outfile + ' -acodec pcm_s16le -ac 1 -ar 16000 /home/mhilmiasyrofi/Documents/cross-asr/' + wavfile + ' -y')
         else :
-            os.system('ffmpeg -i /Users/mhilmiasyrofi/Documents/test-case-generation/' + outfile + ' -acodec pcm_s16le -ac 1 -ar 16000 /Users/mhilmiasyrofi/Documents/test-case-generation/' + wavfile + ' -y')
+            os.system('ffmpeg -i /Users/mhilmiasyrofi/Documents/cross-asr/' + outfile + ' -acodec pcm_s16le -ac 1 -ar 16000 /Users/mhilmiasyrofi/Documents/cross-asr/' + wavfile + ' -y')
 
     inject_alexa_command(timestamp)
 
@@ -363,7 +363,7 @@ def wit_recognize(timestamp) :
 
 def paddledeepspeech_recognize(timestamp):
     filename = "audio_%s.wav" % timestamp
-    fpath = "/test-case-generation/" + "guided_data/wav/" + filename
+    fpath = "/cross-asr/" + "guided_data/wav/" + filename
     
     cmd = 'docker exec -ti deepspeech2 sh -c "cd DeepSpeech && python infer_one_file.py --filename="' + fpath + '" --mean_std_path="models/librispeech/mean_std.npz" --vocab_path="models/librispeech/vocab.txt" --model_path="models/librispeech" --lang_model_path="models/lm/common_crawl_00.prune01111.trie.klm" --decoding_method="ctc_beam_search" --use_gpu=False --beam_size=500 --num_proc_bsearch=8 --num_conv_layers=2 --num_rnn_layers=3 "'
 
@@ -426,7 +426,7 @@ def wav2letter_recognize(timestamp) :
     filename = "audio_%s.wav" % timestamp
     fpath = "guided_data/wav/" + filename
 
-    cmd = "docker run --rm -v ~/Documents/test-case-generation/:/root/host/ -it --ipc=host --name w2l-multi-thread -a stdin -a stdout -a stderr wav2letter/wav2letter:inference-latest sh -c  \"/root/wav2letter/build/inference/inference/examples/multithreaded_streaming_asr_example  --input_files_base_path /root/host/sr_wav2letter/model  --input_audio_files /root/host/" + fpath + "  --output_files_base_path /root/host/output/wav2letter/\""
+    cmd = "docker run --rm -v ~/Documents/cross-asr/:/root/host/ -it --ipc=host --name w2l-multi-thread -a stdin -a stdout -a stderr wav2letter/wav2letter:inference-latest sh -c  \"/root/wav2letter/build/inference/inference/examples/multithreaded_streaming_asr_example  --input_files_base_path /root/host/sr_wav2letter/model  --input_audio_files /root/host/" + fpath + "  --output_files_base_path /root/host/output/wav2letter/\""
 
     proc = subprocess.Popen([cmd],
                             stdout=subprocess.PIPE, shell=True)
@@ -589,7 +589,7 @@ def initiate_folders() :
 
 if __name__ == '__main__' :    
 
-    needed_bugs_max = 1
+    needed_bugs_max = 50
     
     x = 0
     while x < 3 : 
