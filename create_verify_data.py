@@ -62,20 +62,22 @@ def get_translation(fpath) :
 
 if __name__ == '__main__':
 
-    alexa_translations = get_translation("output/alexa_translation.txt")
+    # alexa_translations = get_translation("output/alexa_translation.txt")
+    # gcloud_translations = get_translation("output/gcloud_translation.txt")
+    # gspeech_translations = get_translation("output/gspeech_translation.txt")
     deepspeech_translations = get_translation("output/deepspeech_translation.txt")
-    gcloud_translations = get_translation("output/gcloud_translation.txt")
-    gspeech_translations = get_translation("output/gspeech_translation.txt")
+    paddledeepspeech_translations = get_translation("output/paddledeepspeech_translation.txt")
     wav2letter_translations = get_translation("output/wav2letter_translation.txt")
     wit_translations = get_translation("output/wit_translation.txt")
 
-    alexa_bugs = get_bug_location("bug/sr/alexa_bug.txt")
+    # alexa_bugs = get_bug_location("bug/sr/alexa_bug.txt")
+    # gcloud_bugs = get_bug_location("bug/sr/gcloud_bug.txt")
+    # gspeech_bugs = get_bug_location("bug/sr/gspeech_bug.txt")
     deepspeech_bugs = get_bug_location("bug/sr/deepspeech_bug.txt")
-    gcloud_bugs = get_bug_location("bug/sr/gcloud_bug.txt")
-    gspeech_bugs = get_bug_location("bug/sr/gspeech_bug.txt")
+    paddledeepspeech_bugs = get_bug_location("bug/sr/paddledeepspeech_bug.txt")
     wav2letter_bugs = get_bug_location("bug/sr/wav2letter_bug.txt")
     wit_bugs = get_bug_location("bug/sr/wit_bug.txt")
-    all_failed_tests = open("bug/sr/all_failed_tests.txt")
+    all_failed_tests = open("bug/undetermined_test_cases.txt")
     lines = all_failed_tests.readlines()
     failed_tests = []
     for id in lines :
@@ -87,10 +89,11 @@ if __name__ == '__main__':
     corpus = file.readlines()
     file.close() 
 
-    alexa_verify_data = open("verify/alexa.txt", "w+")
+    # alexa_verify_data = open("verify/alexa.txt", "w+")
+    # gcloud_verify_data = open("verify/gcloud.txt", "w+")
+    # gspeech_verify_data = open("verify/gspeech.txt", "w+")
     deepspeech_verify_data = open("verify/deepspeech.txt", "w+")
-    gcloud_verify_data = open("verify/gcloud.txt", "w+")
-    gspeech_verify_data = open("verify/gspeech.txt", "w+")
+    paddledeepspeech_verify_data = open("verify/paddledeepspeech.txt", "w+")
     wav2letter_verify_data = open("verify/wav2letter.txt", "w+")
     wit_verify_data = open("verify/wit.txt", "w+")
 
@@ -100,17 +103,20 @@ if __name__ == '__main__':
         i += 1
         if (i not in failed_tests) :
             
-            if (i in alexa_bugs) :
-                alexa_verify_data.write(str(i) + ", " + alexa_translations[i][:-1] + ", " + sentence)
+            # if (i in alexa_bugs) :
+            #     alexa_verify_data.write(str(i) + ", " + alexa_translations[i][:-1] + ", " + sentence)
+            
+            # if (i in gcloud_bugs) :
+            #     gcloud_verify_data.write(str(i) + ", " + gcloud_translations[i][:-1] + ", " + sentence)
+            
+            # if (i in gspeech_bugs) :
+            #     gspeech_verify_data.write(str(i) + ", " + gspeech_translations[i][:-1] + ", " + sentence)
             
             if (i in deepspeech_bugs) :
                 deepspeech_verify_data.write(str(i) + ", " + deepspeech_translations[i][:-1] + ", " + sentence)
             
-            if (i in gcloud_bugs) :
-                gcloud_verify_data.write(str(i) + ", " + gcloud_translations[i][:-1] + ", " + sentence)
-            
-            if (i in gspeech_bugs) :
-                gspeech_verify_data.write(str(i) + ", " + gspeech_translations[i][:-1] + ", " + sentence)
+            if (i in paddledeepspeech_bugs) :
+                paddledeepspeech_verify_data.write(str(i) + ", " + paddledeepspeech_translations[i][:-1] + ", " + sentence)
             
             if (i in wav2letter_bugs) :
                 wav2letter_verify_data.write(str(i) + ", " + wav2letter_translations[i][:-1] + ", " + sentence)
@@ -119,10 +125,11 @@ if __name__ == '__main__':
                 wit_verify_data.write(str(i) + ", " + wit_translations[i][:-1] + ", " + sentence)
             
             
-    alexa_verify_data.close()
+    # alexa_verify_data.close()
+    # gcloud_verify_data.close()
+    # gspeech_verify_data.close()
     deepspeech_verify_data.close()
-    gcloud_verify_data.close()
-    gspeech_verify_data.close()
+    paddledeepspeech_verify_data.close()
     wav2letter_verify_data.close()
     wit_verify_data.close()
     
