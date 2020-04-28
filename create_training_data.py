@@ -20,9 +20,9 @@ def write_undetermined_test_case(writer) :
 if __name__ == '__main__':
 
     # alexa_bugs = get_bug_location("bug/sr/alexa_bug.txt")
-    deepspeech_bugs = get_bug_location("bug/sr/deepspeech_bug.txt")
     # gcloud_bugs = get_bug_location("bug/sr/gcloud_bug.txt")
     # gspeech_bugs = get_bug_location("bug/sr/gspeech_bug.txt")
+    deepspeech_bugs = get_bug_location("bug/sr/deepspeech_bug.txt")
     wav2letter_bugs = get_bug_location("bug/sr/wav2letter_bug.txt")
     wit_bugs = get_bug_location("bug/sr/wit_bug.txt")
     paddledeepspeech_bugs = get_bug_location("bug/sr/paddledeepspeech_bug.txt")
@@ -65,7 +65,7 @@ if __name__ == '__main__':
             write_label(deepspeech_bugs, deepspeech_training_data)
             write_label(wav2letter_bugs, wav2letter_training_data)
             write_label(wit_bugs, wit_training_data)
-            write_label(wit_bugs, paddledeepspeech_training_data)
+            write_label(paddledeepspeech_bugs, paddledeepspeech_training_data)
         else :
             # write_undetermined_test_case(alexa_training_data)
             # write_undetermined_test_case(gcloud_training_data)

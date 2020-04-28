@@ -24,7 +24,7 @@ def preprocess_translation(translation):
         # if w == "mister":
         #     substitution = "mr"
         # elif w == "missus":
-        #     substitution = "mrs"python
+        #     substitution = "mrs"
         # elif w == "can not":
         #     substitution = "cannot"
         # elif w == "mr.":
