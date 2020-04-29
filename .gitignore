@@ -149,6 +149,8 @@ training_data/
 guided_data/
 model/
 verify/
+performance/
+result/
 
 sr_alexa/alexa_data/
 sr_alexa/alexa_client/
