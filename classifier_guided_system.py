@@ -63,7 +63,7 @@ SR = [DEEPSPEECH, WIT, WAV2LETTER, PADDLEDEEPSPEECH]
 
 r = speech_recognition.Recognizer()
 
-CLASSIFIER_MODEL = "SVC"
+CLASSIFIER_MODEL = "RF"
 classifier = {}
 for sr in SR :
     classifier_fpath = "model/" + CLASSIFIER_MODEL + "_" + sr + ".sav"
@@ -589,7 +589,7 @@ def initiate_folders() :
 
 if __name__ == '__main__' :    
 
-    needed_bugs_max = 50
+    needed_bugs_max = 30
     
     x = 0
     while x < 3 : 
@@ -610,60 +610,66 @@ if __name__ == '__main__' :
         # shuffle the data
         random.shuffle(corpus)
 
-        # # using queue to process data one by one
-        # q = queue.Queue()
-        # for data in corpus :
-        #     q.put(data)
+        # using queue to process data one by one
+        q = queue.Queue()
+        for data in corpus :
+            q.put(data)
 
-        # detected = []
+        detected = []
         
-        # time_execution_with_classifier = {}
+        time_execution_with_classifier = {}
+        number_of_data = {}
+
         
-        # start_time = time.time()
-        # current_bug = 0
-        # while (not q.empty() and current_bug < needed_bugs_max) :
-        #     data = q.get()           
+        start_time = time.time()
+        current_bug = 0
+
+        i = 0
+        while (not q.empty() and current_bug < needed_bugs_max) :
+            i += 1
+            data = q.get()           
             
-        #     timestamp = get_timestamp()
-        #     filepath = generate_speech(data["text"], timestamp)
-        #     is_predicted_bug = classify_speech(filepath)
-        #     if (is_predicted_bug) :
+            # timestamp = get_timestamp()
+            # filepath = generate_speech(data["text"], timestamp)
+            # is_predicted_bug = classify_speech(filepath)
+            # if (is_predicted_bug) :
 
-        #     # is_predicted_bug = classify_text(data["text"])
-        #     # if (is_predicted_bug) :
-        #     #     timestamp = get_timestamp()
-        #     #     generate_speech(data["text"], timestamp)
-        #         transcriptions = recognize_speech(timestamp)
-        #         errors = calculate_recognition_error(data["text"], transcriptions)
-        #         bugs = {}
-        #         if 0 not in errors.values() :
-        #             print("Can't determine bug")
-        #         elif np.sum(errors.values()) == 0 :
-        #             print("All Speech Recognition can recognize")
-        #         else :
-        #             bugs = bug_locator(errors)
+            is_predicted_bug = classify_text(data["text"])
+            if (is_predicted_bug) :
+                timestamp = get_timestamp()
+                generate_speech(data["text"], timestamp)
+                transcriptions = recognize_speech(timestamp)
+                errors = calculate_recognition_error(data["text"], transcriptions)
+                bugs = {}
+                if 0 not in errors.values() :
+                    print("Can't determine bug")
+                elif np.sum(errors.values()) == 0 :
+                    print("All Speech Recognition can recognize")
+                else :
+                    bugs = bug_locator(errors)
                 
-        #         if (1 in bugs.values()) :
-        #             print("\n\n\n")
-        #             print("text")
-        #             print(data["text"])
-        #             print("transcriptions")
-        #             print(transcriptions)
-        #             print("error")
-        #             print(errors)
-        #             print("bugs")
-        #             print(bugs)
-        #             # break
-        #             current_bug += 1
-        #             time_execution = round(time.time() - start_time, 2)
-        #             time_execution_with_classifier[current_bug] = time_execution
+                if (1 in bugs.values()) :
+                    print("\n\n\n")
+                    print("text")
+                    print(data["text"])
+                    print("transcriptions")
+                    print(transcriptions)
+                    print("error")
+                    print(errors)
+                    print("bugs")
+                    print(bugs)
+                    # break
+                    current_bug += 1
+                    time_execution = round(time.time() - start_time, 2)
+                    time_execution_with_classifier[current_bug] = time_execution
+                    number_of_data[current_bug] = i
         
-        # file = open("result/with_classifier_" + str(needed_bugs_max) + "_" +
-        #             str(datetime.now()) + ".txt", "w+")
-        # for k, v in time_execution_with_classifier.items():
-        #     file.write("%d, %f\n" % (k, v))
+        file = open("result/with_classifier_" + str(needed_bugs_max) + "_" +
+                    str(datetime.now()) + ".txt", "w+")
+        for k, v in time_execution_with_classifier.items():
+            file.write("%d, %d, %.2f\n" % (k, number_of_data[k], v))
         
-        # file.close()
+        file.close()
 
 
         # using queue to process data one by one
