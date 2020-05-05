@@ -8,10 +8,10 @@ import numpy as np
 import pandas as pd
 
 from sklearn.utils import resample
+from g2p_en import G2p
 
-BUG_LABEL = 1
-NON_BUG_LABEL = 0
-UNDETERMINED_LABEL = -1
+import constant
+
 
 # read data
 def read_data(fpath):
@@ -42,9 +42,9 @@ def get_fail_test_case(df, column_name="label"):
 
     for key in df.keys():
         bugs = union(bugs, get_index_in_list_with_have_value(
-            df[key][column_name], BUG_LABEL))
+            df[key][column_name], constant.BUG_LABEL))
         non_bugs = union(non_bugs, get_index_in_list_with_have_value(
-            df[key][column_name], NON_BUG_LABEL))
+            df[key][column_name], constant.NON_BUG_LABEL))
 
     fail_test_case = intersection(bugs, non_bugs)
     
@@ -56,9 +56,9 @@ def get_success_test_case(df, column_name="label"):
 
     for key in df.keys():
         bugs = union(bugs, get_index_in_list_with_have_value(
-            df[key][column_name], BUG_LABEL))
+            df[key][column_name], constant.BUG_LABEL))
         non_bugs = union(non_bugs, get_index_in_list_with_have_value(
-            df[key][column_name], NON_BUG_LABEL))
+            df[key][column_name], constant.NON_BUG_LABEL))
     
     success_test_case = []
     for id in non_bugs:
@@ -70,8 +70,8 @@ def get_success_test_case(df, column_name="label"):
 
 def upsampleMinority(df):
     # Separate majority and minority classes
-    df_majority = df[df.label == NON_BUG_LABEL]
-    df_minority = df[df.label == BUG_LABEL]
+    df_majority = df[df.label == constant.NON_BUG_LABEL]
+    df_minority = df[df.label == constant.BUG_LABEL]
 
     # Upsample minority class
     df_minority_upsampled = resample(df_minority,
@@ -88,8 +88,8 @@ def upsampleMinority(df):
 
 def downsampleMajority(df):
     # Separate majority and minority classes
-    df_majority = df[df.label == NON_BUG_LABEL]
-    df_minority = df[df.label == BUG_LABEL]
+    df_majority = df[df.label == constant.NON_BUG_LABEL]
+    df_minority = df[df.label == constant.BUG_LABEL]
 
     # Downsample majority class
     df_majority_downsampled = resample(df_majority,
@@ -106,9 +106,9 @@ def downsampleMajority(df):
 
 def resampleToFixNumber(df, n):
     # Separate majority and minority classes
-    df_non_bug = df[df.label == NON_BUG_LABEL]
-    df_bug = df[df.label == BUG_LABEL]
-    df_undetermined = df[df.label == UNDETERMINED_LABEL]
+    df_non_bug = df[df.label == constant.NON_BUG_LABEL]
+    df_bug = df[df.label == constant.BUG_LABEL]
+    df_undetermined = df[df.label == constant.UNDETERMINED_LABEL]
 
     df_non_bug = resample(df_non_bug,
                           replace=True,     # sample with replacement
@@ -134,9 +134,38 @@ def resampleToFixNumber(df, n):
 def getResampleSize(df):
     size = 0
     for k in df.keys():
-        df_bug = df[k][df[k].label == BUG_LABEL]
+        df_bug = df[k][df[k].label == constant.BUG_LABEL]
         if (len(df_bug["label"]) > size):
             size = len(df_bug["label"])
+
+    return size
+
+
+def resample_to_fix_number(df, n):
+    # Separate majority and minority classes
+    df_bug = df[df.label == constant.DETERMINED_LABEL]
+    df_undetermined = df[df.label == constant.UNDETERMINED_LABEL]
+
+    df_bug = resample(df_bug,
+                      replace=True,     # sample with replacement
+                      n_samples=n,    # to match majority class
+                      random_state=123)  # reproducible results
+
+    df_undetermined = resample(df_undetermined,
+                               replace=True,     # sample with replacement
+                               n_samples=n,    # to match majority class
+                               random_state=123)  # reproducible results
+
+    # Combine majority class with upsampled minority class
+    df_resampled = pd.concat([df_undetermined, df_bug])
+
+    return df_resampled.copy()
+
+def get_resample_size(df):
+    size = 0
+    df_bug = df[df.label == constant.DETERMINED_LABEL]
+    if (len(df_bug["label"]) > size):
+        size = len(df_bug["label"])
 
     return size
 
@@ -148,6 +177,13 @@ def text_process(sentence):
     nopunc = [char for char in sentence if char not in string.punctuation]
     nopunc = ''.join(nopunc)
     return [word for word in nopunc.split()]
+
+
+def phoneme_text_process(sentence):
+    g2p = G2p()
+    nopunc = [char for char in sentence if char not in string.punctuation]
+    nopunc = ''.join(nopunc)
+    return g2p(nopunc)
 
 def train_classifier(clf, feature_train, labels_train):    
     clf.fit(feature_train, labels_train)
