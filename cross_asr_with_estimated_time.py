@@ -628,10 +628,10 @@ if __name__ == '__main__' :
 
     cases = initiate_cases()
 
-    needed_bugs_max = 10000
+    needed_bugs_max = 200
     
     x = 0
-    while x < 3 : 
+    while x < 2 : 
         x += 1
         
         corpus = test_corpus.copy()
@@ -671,7 +671,7 @@ if __name__ == '__main__' :
                     # print(data["text"])
                     # print("cases")
                     # print(case)
-                    # break
+                    
                     current_bug += 1
                     time_execution = round(time.time() - start_time + j * 29.4815, 2)
                     r = {}
@@ -679,8 +679,8 @@ if __name__ == '__main__' :
                     r["number_of_data"] = i
                     r["number_of_bug"] = list(case.values()).count(BUG_LABEL)
                     r["id_corpus"] = data["id"]
-                    r["bugs"] = list(case.values())
-
+                    r["bugs"] = case
+                    
                     result[current_bug] = r
 
                     
@@ -690,7 +690,8 @@ if __name__ == '__main__' :
         i = 0
         for k in result.keys():
             i += 1
-            file.write("%d, %d, %.2f, %d\n" % (i, result[k]["number_of_data"], result[k]["time_execution"], result[k]["number_of_bug"]))
+            file.write("%d, %d, %.2f, %d, %d, %d, %d, %d\n" % (
+                i, result[k]["number_of_data"], result[k]["time_execution"], result[k]["number_of_bug"], result[k]["bugs"][DEEPSPEECH], result[k]["bugs"][WIT], result[k]["bugs"][WAV2LETTER], result[k]["bugs"][PADDLEDEEPSPEECH]))
         
         file.close()
 
@@ -722,7 +723,7 @@ if __name__ == '__main__' :
                 # print(data["text"])
                 # print("cases")
                 # print(case)
-                # break
+                
                 current_bug += 1
                 time_execution = round(
                     time.time() - start_time + i * 29.4815, 2)
@@ -731,7 +732,7 @@ if __name__ == '__main__' :
                 r["number_of_data"] = i
                 r["number_of_bug"] = list(case.values()).count(BUG_LABEL)
                 r["id_corpus"] = data["id"]
-                r["bugs"] = list(case.values())
+                r["bugs"] = case
 
                 result[current_bug] = r
 
@@ -740,8 +741,8 @@ if __name__ == '__main__' :
         i = 0
         for k in result.keys():
             i += 1
-            file.write("%d, %d, %.2f, %d\n" % (
-                i, result[k]["number_of_data"], result[k]["time_execution"], result[k]["number_of_bug"]))
+            file.write("%d, %d, %.2f, %d, %d, %d, %d, %d\n" % (
+                i, result[k]["number_of_data"], result[k]["time_execution"], result[k]["number_of_bug"], result[k]["bugs"][DEEPSPEECH], result[k]["bugs"][WIT], result[k]["bugs"][WAV2LETTER], result[k]["bugs"][PADDLEDEEPSPEECH]))
 
         file.close()
     
