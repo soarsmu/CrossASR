@@ -3,6 +3,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import time
 import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -151,14 +152,24 @@ def infer():
     data = fdata.readlines()
     fdata.close()
 
+
+    file = open("sr_paddledeepspeech/execution_time/" + str(datetime.now()) + ".txt", "w+")
+
+
     result_transcripts = []
     i = 0
     for audio_data in data :
         i += 1
+        start_time = time.time()
         filename = json.loads(audio_data)["audio_filepath"] 
         transcription = file_to_transcript(filename)
         print("DeepSpeech2 Translation - %d: %s" % (i, str(transcription)))
         result_transcripts.append(transcription)
+        end_time = time.time()
+        time_execution = round(end_time - start_time, 2)
+        file.write("%d, %.2f\n" % (i, time_execution))
+
+    file.close()
 
     paddledeepspeech_translation = open(
         "output/paddledeepspeech_translation_" + str(datetime.now()) + ".txt", "w+")
@@ -170,6 +181,9 @@ def infer():
         paddledeepspeech_translation.write("%s, %d, %s\n" %
                                             ("tts_google", i, result))
     paddledeepspeech_translation.close()
+
+
+
 
 def main():
     print_arguments(args)

@@ -1,6 +1,7 @@
 import os
 import glob
 import subprocess
+import time
 from datetime import datetime
 
 if __name__ == '__main__':
@@ -29,10 +30,14 @@ if __name__ == '__main__':
     #                 translation_writer.write(
     #                     "%s" % (dirpath + ", " + filename[6:-4] + ", " + transcription))
     #                 print("Transcription: " + transcription)
+    
+    file = open("sr_deepspeech/execution_time/" + str(datetime.now()) + ".txt", "w+")
 
 
     dirpath = "data/tts_google/generated_speech/"
-    for i in range(24793, 28540):
+    for i in range(453, 28540):
+        start_time = time.time()
+
         filename = "audio_" + str(i) + ".wav"
         fpath = os.path.join(dirpath, filename)
         print("Processing: " + fpath)
@@ -48,7 +53,12 @@ if __name__ == '__main__':
             "%s" % (dirpath + ", " + filename[6:-4] + ", " + transcription))
         print("Transcription: " + transcription)
 
+        end_time = time.time()
+        time_execution = round(end_time - start_time, 2)
+        file.write("%d, %.2f\n" % (i, time_execution))
 
+
+    file.close()
 
     translation_writer.close()
 

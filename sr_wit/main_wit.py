@@ -6,6 +6,7 @@ import glob
 from os import path
 import uuid
 import time
+from datetime import datetime
 import base64
 import hmac
 import hashlib
@@ -30,7 +31,13 @@ if __name__ == '__main__':
     dirpath = "data/tts_google/generated_speech/"
     WIT_AI_KEY = "5PBOPP2VVZM3MJFQOKK57YRG4DFWXIBZ"
     client = Wit(WIT_AI_KEY)
-    for i in range(23041, 28540):
+    file = open("sr_wit/execution_time/" +
+                str(datetime.now()) + ".txt", "w+")
+
+    for i in range(453, 28540):
+
+        start_time = time.time()
+
         filename = "audio_" + str(i) + ".wav"
         fpath = os.path.join(dirpath, filename)
         print("Processing: " + fpath)
@@ -52,7 +59,14 @@ if __name__ == '__main__':
             except Exception as e: 
                 print("Could not request results from Wit.ai service; {0}".format(e))
             
+            end_time = time.time()
+            time_execution = round(end_time - start_time, 2)
+            file.write("%d, %.2f\n" % (i, time_execution))
+        
+
             if (i % 100 == 0) :
                 sleep(1)
+
+    file.close()
 
     translation_wit_writer.close()
