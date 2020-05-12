@@ -9,3 +9,5 @@ NUM_CORES = 4
 # word2vec parameter
 W2V_EMBEDDING_SIZE = 30
 W2V_EPOCH = 20
+
+CORPUS_FPATH = "corpus/europarl.txt"
