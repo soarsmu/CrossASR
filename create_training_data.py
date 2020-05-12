@@ -1,3 +1,4 @@
+import constant
 
 def get_bug_location(fpath) :
     file = open(fpath)
@@ -10,12 +11,12 @@ def get_bug_location(fpath) :
 
 def write_label(bugs, writer) :
     if (i in bugs):
-        writer.write(", 1\n")
+        writer.write(", " + str(constant.BUG_LABEL) +"\n")
     else :
-        writer.write(", 0\n")
+        writer.write(", " + str(constant.NON_BUG_LABEL) + "\n")
 
 def write_undetermined_test_case(writer) :
-    writer.write(", -1\n")
+    writer.write(", " + str(constant.UNDETERMINED_LABEL) + "\n")
 
 if __name__ == '__main__':
 
