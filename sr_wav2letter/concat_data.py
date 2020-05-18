@@ -4,36 +4,37 @@ import subprocess
 
 if __name__ == '__main__':
 
-    data = "output/wav2letter/"
+    TTS = "google"
 
-    wav2letter_tanslation = open("output/wav2letter_translation.txt", "w+")
+    data = "data/" + TTS + "/wav2letter/"
+    raw_data = "data/" + TTS + "/wav2letter/raw_transcription/"
 
-    for (dirpath, _, filenames) in os.walk(data):
-        for i in range(1, len(filenames)+1):
-            filename = "audio_" + str(i) + ".wav.txt"
-            if (filename in filenames):
-                fpath = os.path.join(dirpath, filename)
-                print("Processing: " + fpath)
-                
-                file = open(fpath)
+    wav2letter_tanslation = open(data + "transcription.txt", "w+")
 
-                lines = file.readlines()
+    for i in range(1, 20001):
+        filename = "audio_" + str(i) + ".wav.txt"
+        fpath = os.path.join(raw_data, filename)
+        print("Processing: " + fpath)
+        
+        file = open(fpath)
 
-                translation = ""
+        lines = file.readlines()
 
-                j = 0
-                for line in lines :
-                    j += 1
-                    if (j != 1) :
-                        part = line.split(",")[-1]
-                        if part != "" :
-                            translation += part[:-1]
-                
+        translation = ""
 
-                translation = translation[:-1]
+        j = 0
+        for line in lines :
+            j += 1
+            if (j != 1) :
+                part = line.split(",")[-1]
+                if part != "" :
+                    translation += part[:-1]
+        
 
-                wav2letter_tanslation.write("data/tts_google/generated_speech, " + str(i) + ", " + translation + "\n")
-                                        
-                file.close()
+        translation = translation[:-1]
+
+        wav2letter_tanslation.write(TTS + ", " + str(i) + ", " + translation + "\n")
+                                
+        file.close()
 
     wav2letter_tanslation.close()
