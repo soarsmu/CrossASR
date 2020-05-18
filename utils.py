@@ -44,9 +44,9 @@ def get_fail_test_case(df, column_name="label"):
 
     for key in df.keys():
         bugs = union(bugs, get_index_in_list_with_have_value(
-            df[key][column_name], constant.BUG_LABEL))
+            df[key][column_name], constant.FAIL_TEST_CASE))
         non_bugs = union(non_bugs, get_index_in_list_with_have_value(
-            df[key][column_name], constant.NON_BUG_LABEL))
+            df[key][column_name], constant.SUCCESS_TEST_CASE))
 
     fail_test_case = intersection(bugs, non_bugs)
     
@@ -58,9 +58,9 @@ def get_success_test_case(df, column_name="label"):
 
     for key in df.keys():
         bugs = union(bugs, get_index_in_list_with_have_value(
-            df[key][column_name], constant.BUG_LABEL))
+            df[key][column_name], constant.FAIL_TEST_CASE))
         non_bugs = union(non_bugs, get_index_in_list_with_have_value(
-            df[key][column_name], constant.NON_BUG_LABEL))
+            df[key][column_name], constant.SUCCESS_TEST_CASE))
     
     success_test_case = []
     for id in non_bugs:
@@ -72,8 +72,8 @@ def get_success_test_case(df, column_name="label"):
 
 def upsampleMinority(df):
     # Separate majority and minority classes
-    df_majority = df[df.label == constant.NON_BUG_LABEL]
-    df_minority = df[df.label == constant.BUG_LABEL]
+    df_majority = df[df.label == constant.SUCCESS_TEST_CASE]
+    df_minority = df[df.label == constant.FAIL_TEST_CASE]
 
     # Upsample minority class
     df_minority_upsampled = resample(df_minority,
@@ -90,8 +90,8 @@ def upsampleMinority(df):
 
 def downsampleMajority(df):
     # Separate majority and minority classes
-    df_majority = df[df.label == constant.NON_BUG_LABEL]
-    df_minority = df[df.label == constant.BUG_LABEL]
+    df_majority = df[df.label == constant.SUCCESS_TEST_CASE]
+    df_minority = df[df.label == constant.FAIL_TEST_CASE]
 
     # Downsample majority class
     df_majority_downsampled = resample(df_majority,
@@ -108,9 +108,9 @@ def downsampleMajority(df):
 
 def resampleToFixNumber(df, n):
     # Separate majority and minority classes
-    df_non_bug = df[df.label == constant.NON_BUG_LABEL]
-    df_bug = df[df.label == constant.BUG_LABEL]
-    df_undetermined = df[df.label == constant.UNDETERMINED_LABEL]
+    df_non_bug = df[df.label == constant.SUCCESS_TEST_CASE]
+    df_bug = df[df.label == constant.FAIL_TEST_CASE]
+    df_undetermined = df[df.label == constant.UNDETERMINED_TEST_CASE]
 
     df_non_bug = resample(df_non_bug,
                           replace=True,     # sample with replacement
@@ -136,7 +136,7 @@ def resampleToFixNumber(df, n):
 def getResampleSize(df):
     size = 0
     for k in df.keys():
-        df_bug = df[k][df[k].label == constant.BUG_LABEL]
+        df_bug = df[k][df[k].label == constant.FAIL_TEST_CASE]
         if (len(df_bug["label"]) > size):
             size = len(df_bug["label"])
 
@@ -146,7 +146,7 @@ def getResampleSize(df):
 def resample_to_fix_number(df, n):
     # Separate majority and minority classes
     df_bug = df[df.label == constant.DETERMINED_LABEL]
-    df_undetermined = df[df.label == constant.UNDETERMINED_LABEL]
+    df_undetermined = df[df.label == constant.UNDETERMINED_TEST_CASE]
 
     df_bug = resample(df_bug,
                       replace=True,     # sample with replacement
