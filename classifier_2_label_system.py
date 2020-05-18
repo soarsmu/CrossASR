@@ -8,6 +8,8 @@ import string
 
 import math
 
+import requests, urllib
+
 import numpy as np
 
 import wave
@@ -119,6 +121,11 @@ def get_corpus(fpath):
     # random.shuffle(corpus)
     return corpus
 
+def classify_bert(text) :
+    resp = requests.get('http://10.4.4.55:5000/translate?text=' + urllib.parse.quote(text))
+    if resp.status_code != 200:        
+        raise 'GET /translate/ {}'.format(resp.status_code)
+    return int(resp.content.decode("utf-8"))
 
 def classify_text(text):
 
@@ -582,7 +589,7 @@ def initiate_folders():
 
 if __name__ == '__main__':
 
-    needed_bugs_max = 30
+    time_max = 60 # in minutes
 
     x = 0
     while x < 3:
@@ -615,9 +622,11 @@ if __name__ == '__main__':
 
         start_time = time.time()
         current_bug = 0
+        last_time = 0
 
-        i = 0
-        while (not q.empty() and current_bug < needed_bugs_max):
+        i = 0  # number of texts processed
+        j = 0  # number of predicted
+        while (not q.empty() and last_time < time_max):
             i += 1
             data = q.get()
 
@@ -626,7 +635,7 @@ if __name__ == '__main__':
             # is_predicted_bug = classify_speech(filepath)
             # if (is_predicted_bug) :
 
-            is_predicted_bug = classify_text(data["text"])
+            is_predicted_bug = classify_bert(data["text"])
             if (is_predicted_bug):
                 timestamp = get_timestamp()
                 generate_speech(data["text"], timestamp)
@@ -651,13 +660,13 @@ if __name__ == '__main__':
                     print(errors)
                     print("bugs")
                     print(bugs)
-                    # break
+
                     current_bug += 1
                     time_execution = round(time.time() - start_time, 2)
                     time_execution_with_classifier[current_bug] = time_execution
                     number_of_data[current_bug] = i
 
-        file = open("result/2_label_with_classifier_" + str(needed_bugs_max) + "_" +
+        file = open("result/2_label_with_classifier_" + str(time_max) + "_" +
                     str(datetime.now()) + ".txt", "w+")
         for k, v in time_execution_with_classifier.items():
             file.write("%d, %d, %.2f\n" % (k, number_of_data[k], v))
@@ -703,13 +712,13 @@ if __name__ == '__main__':
                 print(errors)
                 print("bugs")
                 print(bugs)
-                # break
+
                 current_bug += 1
                 time_execution = round(time.time() - start_time, 2)
                 time_execution_without_classifier[current_bug] = time_execution
                 number_of_data[current_bug] = i
 
-        file = open("result/2_label_without_classifier_" + str(needed_bugs_max) + "_" +
+        file = open("result/2_label_without_classifier_" + str(time_max) + "_" +
                     str(datetime.now()) + ".txt", "w+")
         for k, v in time_execution_without_classifier.items():
             file.write("%d, %d, %.2f\n" % (k, number_of_data[k], v))

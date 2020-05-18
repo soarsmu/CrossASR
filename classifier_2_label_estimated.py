@@ -216,10 +216,9 @@ if __name__ == '__main__' :
                     # print(case)
                     
                     current_bug += 1
-                    time_execution = time.time() - start_time + j * 29.4815
-                    t = math.ceil(time_execution / 60.0)
+                    
                     bug = {}
-                    bug["time_execution"] = t
+                    
                     # bug["number_of_data"] = i
                     bug["number_of_bug"] = list(case.values()).count(constant.BUG_LABEL)
                     # bug["id_corpus"] = data["id"]
@@ -230,9 +229,12 @@ if __name__ == '__main__' :
 
                     bug["case"] = case
                     
+                    time_execution = time.time() - start_time + j * 29.4815
+                    last_time = math.ceil(time_execution / 60.0)
+                    bug["time_execution"] = last_time
                     bugs[current_bug] = bug
 
-                    last_time = t
+                    
         
 
         result = {}

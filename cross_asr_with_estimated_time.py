@@ -10,6 +10,8 @@ import numpy as np
 
 import utils
 
+import requests, urllib
+
 import wave
 from gtts import gTTS
 
@@ -140,6 +142,14 @@ def get_case(cases, id) :
         case[sr] = cases[sr][id]
 
     return case
+
+def classify_bert(text):
+    resp = requests.get(
+        'http://10.4.4.55:5000/translate?text=' + urllib.parse.quote(text))
+    if resp.status_code != 200:
+        raise 'GET /translate/ {}'.format(resp.status_code)
+    return int(resp.content.decode("utf-8"))
+
 
 def classify_text(text) :
     
@@ -628,10 +638,10 @@ if __name__ == '__main__' :
 
     cases = initiate_cases()
 
-    needed_bugs_max = 200
+    needed_bugs_max = 150
     
     x = 0
-    while x < 2 : 
+    while x < 3 : 
         x += 1
         
         corpus = test_corpus.copy()
@@ -657,7 +667,7 @@ if __name__ == '__main__' :
             i += 1
             data = q.get()           
 
-            is_predicted_bug = classify_text(data["text"])
+            is_predicted_bug = classify_bert(data["text"])
             if (is_predicted_bug) :
                 j += 1
                 case = get_case(cases, data["id"])
