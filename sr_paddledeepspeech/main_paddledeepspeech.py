@@ -194,7 +194,7 @@ def infer():
     file.close()
 
 
-    i = 1000
+    i = 0
     for result in result_transcripts:
         i += 1
         # print("%d - %s" % (i, result))
