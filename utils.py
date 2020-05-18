@@ -7,6 +7,8 @@ import math
 import numpy as np
 import pandas as pd
 
+from normalise import normalise, tokenize_basic
+
 from sklearn.utils import resample
 from g2p_en import G2p
 
@@ -191,43 +193,23 @@ def train_classifier(clf, feature_train, labels_train):
 def predict_labels(clf, features):
     return clf.predict(features)
 
+
+def remove_double_space(sentence):
+    return re.sub(' +', ' ', sentence)
+
+
+def remove_punctuation(sentence):
+    return sentence.translate(str.maketrans('', '', string.punctuation))
+
+
+def normalize_text(sentence):
+    return " ".join(normalise(sentence, tokenizer=tokenize_basic, verbose=False))
+
 def preprocess_text(text):
     text = text.lower()
-    words = text.split(" ")
-    preprocessed = []
-    for w in words:
-        substitution = ""
-        if w == "mister":
-            substitution = "mr"
-        elif w == "missus":
-            substitution = "mrs"
-        elif w == "can not":
-            substitution = "cannot"
-        elif w == "mr.":
-            substitution = "mr"
-        elif w == "i'm":
-            substitution = "i am"
-        elif w == "you're":
-            substitution = "you are"
-        if w == "1":
-            substitution = "one"
-        elif w == "2":
-            substitution = "two"
-        elif w == "3":
-            substitution = "three"
-        elif w == "4":
-            substitution = "four"
-        elif w == "5":
-            substitution = "five"
-        elif w == "6":
-            substitution = "six"
-        elif w == "7":
-            substitution = "seven"
-        elif w == "8":
-            substitution = "eight"
-        elif w == "9":
-            substitution = "nine"
-        else:
-            substitution = w
-        preprocessed.append(substitution)
-    return " ".join(preprocessed)
+    text = remove_punctuation(text)
+    text = normalize_text(text)
+    text = text.lower()
+    text = remove_double_space(text)
+    text = text.strip()  # remove leading trailing space
+    return text
