@@ -7,35 +7,42 @@ from datetime import datetime
 
 if __name__ == '__main__':
 
-    data = "data/"
+    TTS = "festival"
+    SR = "wav2letter"
 
-    file = open("sr_wav2letter/execution_time/" +
-                str(datetime.now()) + ".txt", "w+")
+    combination = "data/" + TTS + "/" + SR + "/" 
+
+    execution = combination + "execution_time/"
+    transcription = combination + "transcription/"
+
+    foutput = transcription + "raw/"
+
+    if not os.path.exists(combination):
+        os.makedirs(combination)
+    if not os.path.exists(execution):
+        os.makedirs(execution)
+    if not os.path.exists(transcription):
+        os.makedirs(transcription)
+    if not os.path.exists(foutput):
+        os.makedirs(foutput)
+    
+    file = open(execution + str(datetime.now()) + ".txt", "w+")
 
 
-    # for (dirpath, _, filenames) in os.walk(data):
-    #     if (len(filenames) > 0):
-    #         if not os.path.exists(dirpath):
-    #             os.makedirs(dirpath)
-    #         for i in range(1, len(filenames)+1):
-    #             filename = "audio_" + str(i) + ".wav"
-    #             if (filename in filenames):
-    #                 fpath = os.path.join(dirpath, filename)
-    #                 print("Processing: " + fpath)
-    #                 cmd = "docker run --rm -v ~/Documents/test-case-generation/:/root/host/ -it --ipc=host --name w2l-multi-thread -a stdin -a stdout -a stderr wav2letter/wav2letter:inference-latest sh -c  \"/root/wav2letter/build/inference/inference/examples/multithreaded_streaming_asr_example  --input_files_base_path /root/host/sr_wav2letter/model  --input_audio_files /root/host/" + fpath + "  --output_files_base_path /root/host/output/wav2letter/\""
-                    
-    #                 proc = subprocess.Popen([cmd],
-    #                                         stdout=subprocess.PIPE, shell=True)
-    #                 (out, err) = proc.communicate()
-
-    dirpath = "data/tts_google/generated_speech/"
-    for i in range(453, 28540):
+    dirpath = "data/" + TTS + "/generated_speech/"
+    
+    for i in range(1, 20001):
         start_time = time.time()
 
         filename = "audio_" + str(i) + ".wav"
         fpath = os.path.join(dirpath, filename)
         print("Processing: " + fpath)
-        cmd = "docker run --rm -v ~/Documents/cross-asr/:/root/host/ -it --ipc=host --name w2l-multi-thread -a stdin -a stdout -a stderr wav2letter/wav2letter:inference-latest sh -c  \"/root/wav2letter/build/inference/inference/examples/multithreaded_streaming_asr_example  --input_files_base_path /root/host/sr_wav2letter/model  --input_audio_files /root/host/" + fpath + "  --output_files_base_path /root/host/output/wav2letter/\""
+        
+        cmd = "docker run --rm -v ~/Documents/cross-asr/:/root/host/ -it --ipc=host --name w2l-multi-thread -a stdin -a stdout -a stderr wav2letter/wav2letter:inference-latest " + \
+                "sh -c  \"/root/wav2letter/build/inference/inference/examples/multithreaded_streaming_asr_example " + \
+                "--input_files_base_path /root/host/sr_wav2letter/model  " + \
+                "--input_audio_files /root/host/" + fpath + " " + \
+                "--output_files_base_path /root/host/" + foutput + "\""
 
         proc = subprocess.Popen([cmd],
                                 stdout=subprocess.PIPE, shell=True)

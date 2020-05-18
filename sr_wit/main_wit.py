@@ -25,16 +25,31 @@ from datetime import datetime
 
 if __name__ == '__main__':
 
-    translation_wit_writer = open(
-        "output/wit_translation" + str(datetime.now()) + ".txt", "w+")
+    TTS = "festival"
+    SR = "wit"
 
-    dirpath = "data/tts_google/generated_speech/"
+    combination = "data/" + TTS + "/" + SR + "/"
+
+    execution = combination + "execution_time/"
+    transcription = combination + "transcription/"
+
+    if not os.path.exists(combination):
+        os.makedirs(combination)
+    if not os.path.exists(execution):
+        os.makedirs(execution)
+    if not os.path.exists(transcription):
+        os.makedirs(transcription)
+
+    timestamp = str(datetime.now())
+
+    file = open(execution + timestamp + ".txt", "w+")
+    translation_wit_writer = open(transcription + timestamp + ".txt", "w+")
+
+    dirpath = "data/" + TTS + "/generated_speech/"
     WIT_AI_KEY = "5PBOPP2VVZM3MJFQOKK57YRG4DFWXIBZ"
     client = Wit(WIT_AI_KEY)
-    file = open("sr_wit/execution_time/" +
-                str(datetime.now()) + ".txt", "w+")
-
-    for i in range(453, 28540):
+    
+    for i in range(1, 20001):
 
         start_time = time.time()
 
@@ -62,7 +77,8 @@ if __name__ == '__main__':
             end_time = time.time()
             time_execution = round(end_time - start_time, 2)
             file.write("%d, %.2f\n" % (i, time_execution))
-        
+
+            sleep(0.1)
 
             if (i % 100 == 0) :
                 sleep(1)
