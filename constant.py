@@ -1,8 +1,8 @@
-BUG_LABEL = 1
-NON_BUG_LABEL = -1
+FAIL_TEST_CASE = 1
+SUCCESS_TEST_CASE = -1
 
-DETERMINED_LABEL = 1
-UNDETERMINED_LABEL = 0
+DETERMINED_CASE = 1
+UNDETERMINED_CASE = 0
 
 NUM_CORES = 4
 
@@ -11,3 +11,25 @@ W2V_EMBEDDING_SIZE = 30
 W2V_EPOCH = 20
 
 CORPUS_FPATH = "corpus/europarl.txt"
+
+# # mac base folder
+# BASE_FOLDER = "/Users/mhilmiasyrofi/Documents/cross-asr/"
+
+# linux base folder
+BASE_FOLDER = "/home/mhilmiasyrofi/Documents/cross-asr/"
+
+
+GOOGLE = "google"
+APPLE = "apple"
+FESTIVAL = "festival"
+RV = "rv" # ResponsiveVoice
+ESPEAK = "espeak"
+
+DEEPSPEECH = "deepspeech"
+ALEXA = "alexa"
+GCLOUD = "gcloud"
+CHROMESPEECH = "gspeech"
+WIT = "wit"
+WAV2LETTER = "wav2letter"
+PADDLEDEEPSPEECH = "paddledeepspeech"
+
