@@ -1,61 +1,10 @@
 from jiwer import wer
 
+import constant, utils
 
-GOOGLE_TTS = "google"
-APPLE_TTS = "apple"
-TTS = GOOGLE_TTS
+TTS = constant.GOOGLE
 
-DEEPSPEECH = "deepspeech"
-ALEXA = "alexa"
-GCLOUD = "gcloud"
-CHROMESPEECH = "gspeech"
-WIT = "wit"
-WAV2LETTER = "wav2letter"
-PADDLEDEEPSPEECH = "paddledeepspeech"
-SR = [DEEPSPEECH, WIT, WAV2LETTER, PADDLEDEEPSPEECH]
-
-
-def preprocess_translation(translation):
-    translation = translation[:-1].lower()
-    words = translation.split(" ")
-    preprocessed = []
-    for w in words:
-        substitution = ""
-        # if w == "mister":
-        #     substitution = "mr"
-        # elif w == "missus":
-        #     substitution = "mrs"
-        # elif w == "can not":
-        #     substitution = "cannot"
-        # elif w == "mr.":
-        #     substitution = "mr"
-        # elif w == "i'm":
-        #     substitution = "i am"
-        # elif w == "you're":
-        #     substitution = "you are"
-        if w == "1":
-            substitution = "one"
-        elif w == "2":
-            substitution = "two"
-        elif w == "3":
-            substitution = "three"
-        elif w == "4":
-            substitution = "four"
-        elif w == "5":
-            substitution = "five"
-        elif w == "6":
-            substitution = "six"
-        elif w == "7":
-            substitution = "seven"
-        elif w == "8":
-            substitution = "eight"
-        elif w == "9":
-            substitution = "nine"
-        else:
-            substitution = w
-        preprocessed.append(substitution)
-    return " ".join(preprocessed)[1:] + "\n"
-
+SR = [constant.DEEPSPEECH, constant.WIT, constant.WAV2LETTER, constant.PADDLEDEEPSPEECH]
 
 def get_corpus(fpath) :
 
@@ -84,7 +33,7 @@ def calculate_transcription_error(sr, data) :
             audio_id = parts[1]
             idx = int(audio_id)
             translation = parts[2]
-            translation = preprocess_translation(translation)
+            translation = utils.preprocess_text(translation)
             error = round(wer(translation, data[int(audio_id)]), 2)
             if (idx not in errors.keys()):
                 errors[idx] = error
@@ -129,7 +78,7 @@ def write_bugs(bugs) :
 if __name__ == '__main__':
 
     corpus = {}
-    corpus = get_corpus("corpus-sentence.txt")
+    corpus = get_corpus(constant.CORPUS_FPATH)
 
     errors = {}
     for sr in SR :
