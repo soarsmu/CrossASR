@@ -3,6 +3,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import os
 import time
 import sys
 reload(sys)
@@ -153,8 +154,29 @@ def infer():
     fdata.close()
 
 
-    file = open("sr_paddledeepspeech/execution_time/" + str(datetime.now()) + ".txt", "w+")
+    TTS = "festival"
+    SR = "paddledeepspeech"
 
+    ftts = "data/" + TTS + "/"
+    if not os.path.exists(ftts):
+        os.makedirs(ftts)
+
+    combination = "data/" + TTS + "/" + SR + "/"
+
+    execution = combination + "execution_time/"
+    transcription = combination + "transcription/"
+
+    if not os.path.exists(combination):
+        os.makedirs(combination)
+    if not os.path.exists(execution):
+        os.makedirs(execution)
+    if not os.path.exists(transcription):
+        os.makedirs(transcription)
+
+    timestamp = str(datetime.now())
+
+    file = open(execution + timestamp + ".txt", "w+")
+    paddledeepspeech_translation = open(transcription + timestamp + ".txt", "w+")
 
     result_transcripts = []
     i = 0
@@ -171,15 +193,13 @@ def infer():
 
     file.close()
 
-    paddledeepspeech_translation = open(
-        "output/paddledeepspeech_translation_" + str(datetime.now()) + ".txt", "w+")
-    
-    i = 0
+
+    i = 1000
     for result in result_transcripts:
         i += 1
         # print("%d - %s" % (i, result))
         paddledeepspeech_translation.write("%s, %d, %s\n" %
-                                            ("tts_google", i, result))
+                                            (TTS, i, result))
     paddledeepspeech_translation.close()
 
 
@@ -192,3 +212,27 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+# CUDA_VISIBLE_DEVICES=0 \
+# python -u infer.py \
+# --num_samples=10 \
+# --beam_size=500 \
+# --num_proc_bsearch=8 \
+# --num_conv_layers=2 \
+# --num_rnn_layers=3 \
+# --rnn_layer_size=2048 \
+# --alpha=2.5 \
+# --beta=0.3 \
+# --cutoff_prob=1.0 \
+# --cutoff_top_n=40 \
+# --use_gru=False \
+# --use_gpu=False \
+# --share_rnn_weights=True \
+# --infer_manifest='data/tiny/manifest.test-clean' \
+# --mean_std_path='models/librispeech/mean_std.npz' \
+# --vocab_path='models/librispeech/vocab.txt' \
+# --model_path='models/librispeech' \
+# --lang_model_path='models/lm/common_crawl_00.prune01111.trie.klm' \
+# --decoding_method='ctc_beam_search' \
+# --error_rate_type='wer' \
+# --specgram_type='linear'
