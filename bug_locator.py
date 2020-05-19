@@ -2,9 +2,9 @@ from jiwer import wer
 
 import constant, utils
 
-TTS = constant.GOOGLE
+TTS = constant.TTS
 
-SR = [constant.DEEPSPEECH, constant.WIT, constant.WAV2LETTER, constant.PADDLEDEEPSPEECH]
+SR = constant.SR
 
 def get_corpus(fpath) :
 
@@ -22,7 +22,7 @@ def get_corpus(fpath) :
     return data
 
 def calculate_transcription_error(sr, data) :
-    filename = "output/" + sr + "_translation.txt"
+    filename = "data/" + TTS + "/" + sr + "/transcription.txt"
     file = open(filename)
     lines = file.readlines()
     errors = {}
@@ -67,9 +67,8 @@ def localize_bug(errors) :
     return bugs, undetermined_test_cases
 
 def write_bugs(bugs) :
-    
     for sr in SR:
-        filename = "bug/sr/" + sr + "_bug.txt"
+        filename = "data/" + TTS + "/" + sr + "/bug.txt"
         file = open(filename, "w+")
         for idx_bug in sorted(bugs[sr]):
             file.write(str(idx_bug) + "\n")
@@ -86,7 +85,7 @@ if __name__ == '__main__':
 
     bugs, undetermined_test_cases = localize_bug(errors)
 
-    undetermined_test_cases_file = open("bug/undetermined_test_cases.txt", "w+")
+    undetermined_test_cases_file = open("data/" + TTS + "/undetermined_test_cases.txt", "w+")
     for idx in undetermined_test_cases :
         undetermined_test_cases_file.write(str(idx) + "\n")
     undetermined_test_cases_file.close()
