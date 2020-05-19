@@ -61,10 +61,11 @@ if __name__ == '__main__':
             try :
                 translation = None
                 translation = client.speech(audio, None, {'Content-Type': 'audio/wav'})
+                # print(translation)
 
                 if translation != None :
-                    if "_text" in translation:
-                        sentence = str(translation["_text"])
+                    if "text" in translation:
+                        sentence = str(translation["text"])
                         print("Translation: " + sentence)
                         translation_wit_writer.write("%s\n" % (dirpath + ", " + filename[6:-4] + ", " + sentence))
                     else : 
