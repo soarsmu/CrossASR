@@ -10,7 +10,13 @@ NUM_CORES = 4
 W2V_EMBEDDING_SIZE = 30
 W2V_EPOCH = 20
 
-CORPUS_FPATH = "corpus/europarl-20k.txt"
+REUTER = "reuter"
+EUROPARL = "europarl"
+
+DATASET = REUTER
+CORPUS_FPATH = "corpus/" + DATASET + "-20k.txt"
+
+INITIAL_SEED = 12345
 
 # # mac base folder
 # BASE_FOLDER = "/Users/mhilmiasyrofi/Documents/cross-asr/"
@@ -33,6 +39,6 @@ WIT = "wit"
 WAV2LETTER = "wav2letter"
 PADDLEDEEPSPEECH = "paddledeepspeech"
 
-TTS = GOOGLE
+TTS = ESPEAK
 SR = [DEEPSPEECH, WIT, WAV2LETTER, PADDLEDEEPSPEECH]
 
