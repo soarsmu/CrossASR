@@ -220,6 +220,8 @@ def preprocess_text(text):
     text = text.lower()
     text = remove_punctuation(text)
     text = normalize_text(text)
+    # need to remove punctuation again as normalise sometimes add punctuation
+    text = remove_punctuation(text)
     text = text.lower()
     text = substitute_word(text)
     text = remove_double_space(text)
