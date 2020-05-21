@@ -12,83 +12,11 @@ import utils, constant
 
 import requests, urllib
 
-import wave
-from gtts import gTTS
-
-from alexa_client import AlexaClient
-from alexa_client.alexa_client import constants
-from alexa_client.alexa_client import helpers
-
-from wit import Wit
-
-import speech_recognition
-
-from gensim.models import Word2Vec
-
-
-# Speech
-import soundfile as sf  # pip install pysoundfile
-# pip install python_speech_features
-import python_speech_features as speech_lib
-
-from jiwer import wer
-
-import joblib
-
 from datetime import datetime
 
-class WaitTimeoutError(Exception):
-    pass
-class RequestError(Exception):
-    pass
-class UnknownValueError(Exception):
-    pass
+TTS = constant.RV
 
-
-GOOGLE_TTS = "google"
-APPLE_TTS = "apple"
-TTS = GOOGLE_TTS
-
-DEEPSPEECH = "deepspeech"
-ALEXA = "alexa"
-GCLOUD = "gcloud"
-CHROMESPEECH = "gspeech"
-WIT = "wit"
-WAV2LETTER = "wav2letter"
-PADDLEDEEPSPEECH = "paddledeepspeech"
-SR = [DEEPSPEECH, WIT, WAV2LETTER, PADDLEDEEPSPEECH]
-
-r = speech_recognition.Recognizer()
-
-CLASSIFIER_MODEL = "RF"
-classifier = {}
-for sr in SR :
-    classifier_fpath = "model/" + CLASSIFIER_MODEL + "_" + sr + ".sav"
-    classifier[sr] = joblib.load(classifier_fpath)
-
-TRANSFORMER_MODEL = "model/transformer.sav"
-transformer = joblib.load(TRANSFORMER_MODEL)
-
-
-# alexa 
-client_id = os.getenv("CLIENT_ID")
-client_secret = os.getenv("CLIENT_SECRET")
-refresh_token = os.getenv("REFRESH_TOKEN")
-BASE_URL_NORTH_AMERICA = 'alexa.na.gateway.devices.a2z.com'
-
-# wit 
-WIT_AI_KEY = "5PBOPP2VVZM3MJFQOKK57YRG4DFWXIBZ"
-
-if ALEXA in SR :
-    client = AlexaClient(
-        client_id=client_id,
-        secret=client_secret,
-        refresh_token=refresh_token,
-        base_url=BASE_URL_NORTH_AMERICA
-    )
-
-    client.connect()  # authenticate and other handshaking steps
-
+SR = constant.SR
 
 def get_corpus(fpath) :
     corpus = []
@@ -107,7 +35,7 @@ def initiate_cases() :
     cases = {}
 
     for sr in SR :
-        fpath = "training_data/" + sr + ".txt"
+        fpath = "data/" + TTS +  "/" + sr + "/training_data.txt"
         file = open(fpath)
         lines = file.readlines()
         id = 0
@@ -121,6 +49,45 @@ def initiate_cases() :
 
     return cases
 
+def initiate_execution_time() :
+    ets = {}
+
+    for sr in SR :
+        fpath = "data/" + TTS +  "/" + sr + "/execution_time.txt"
+        file = open(fpath)
+        lines = file.readlines()
+        id = 0
+        et = {}
+        for l in lines:
+            id += 1
+            val = l.split(",")[-1][:-1]
+            # print(val)
+            if (val != "") :
+                et[id] = float(val)
+        file.close()
+
+        ets[sr] = et
+
+    return ets
+
+
+def get_generating_time():
+    gt = {}
+
+    fpath = "data/" + TTS + "/generating_time.txt"
+    file = open(fpath)
+    lines = file.readlines()
+    id = 0
+    for l in lines:
+        id += 1
+        val = l.split(",")[-1][:-1]
+        # print(val)
+        if (val != ""):
+            gt[id] = float(val)
+    file.close()
+
+    return gt
+
 def get_case(cases, id) :
     case = {}
     
@@ -128,6 +95,23 @@ def get_case(cases, id) :
         case[sr] = cases[sr][id]
 
     return case
+
+def get_average_execution_time(ets):
+    avg = {}
+    for sr in SR :
+        avg[sr] = round(np.mean(list(ets[sr].values())), 2)
+    return avg
+
+def get_execution_time(ets, avg, id) :
+    et = 0.0
+    for sr in SR :
+        if id in ets[sr].keys() :
+            et += ets[sr][id]
+        else :
+            et += avg[sr]
+
+    return et
+
 
 def classify_bert(text):
     text = utils.preprocess_text(text)
@@ -138,27 +122,10 @@ def classify_bert(text):
     return int(resp.content.decode("utf-8"))
     
 
-def initiate_folders() :
-    folders = []
-    main_folder = "guided_data/"
-    folders.append(main_folder)
-    mp3_google_tts_folder =  main_folder + "mp3/"
-    folders.append(mp3_google_tts_folder)
-    alexa_data_folder = main_folder + "alexa_wav/"
-    folders.append(alexa_data_folder)
-    wav_folder = main_folder + "wav/"
-    folders.append(wav_folder)
-
-    for folder in folders :
-        if not os.path.exists(folder):
-            os.makedirs(folder)
-
 
 if __name__ == '__main__' :  
 
-    initiate_folders()
-
-    fpath = "corpus-sentence.txt"
+    fpath = "corpus/europarl-20k.txt"
     corpus = get_corpus(fpath)
 
     test_corpus = []
@@ -168,6 +135,11 @@ if __name__ == '__main__' :
         test_corpus.append(corpus[i])
 
     cases = initiate_cases()
+    ets = initiate_execution_time()
+    gt = get_generating_time()
+    avg = get_average_execution_time(ets)
+
+    # print(get_execution_time(ets, avg, 1))
 
     time_max = 60
     
@@ -193,20 +165,20 @@ if __name__ == '__main__' :
         start_time = time.time()
         current_bug = 0
         last_time = 0
+        cumulative_time = 0
 
         i = 0 # number of texts processed
-        j = 0 # number of predicted
         while (not q.empty() and last_time <= time_max) :
             i += 1
             data = q.get()           
 
             is_predicted_bug = classify_bert(data["text"])
             if (is_predicted_bug) :
-                j += 1
                 case = get_case(cases, data["id"])
-                if constant.UNDETERMINED_LABEL in case.values() :
+                cumulative_time += gt[data["id"]] + get_execution_time(ets, avg, data["id"])
+                if constant.UNDETERMINED_TEST_CASE in case.values() :
                     print("Can't determine bug")
-                elif constant.BUG_LABEL not in case.values():
+                elif constant.FAIL_TEST_CASE not in case.values():
                     print("All Speech Recognition can recognize the speech")
                 else :
                     # print("\n\n\n")
@@ -220,7 +192,7 @@ if __name__ == '__main__' :
                     bug = {}
                     
                     # bug["number_of_data"] = i
-                    bug["number_of_bug"] = list(case.values()).count(constant.BUG_LABEL)
+                    bug["number_of_bug"] = list(case.values()).count(constant.FAIL_TEST_CASE)
                     # bug["id_corpus"] = data["id"]
                     for sr in SR :
                         # change the label to make easier in cumulative calculation
@@ -229,13 +201,10 @@ if __name__ == '__main__' :
 
                     bug["case"] = case
                     
-                    time_execution = time.time() - start_time + j * 29.4815
+                    time_execution = time.time() - start_time + cumulative_time
                     last_time = math.ceil(time_execution / 60.0)
                     bug["time_execution"] = last_time
                     bugs[current_bug] = bug
-
-                    
-        
 
         result = {}
 
@@ -257,12 +226,12 @@ if __name__ == '__main__' :
             
                     
                     
-        file = open("result/estimated/2_label/with_classifier_" + str(time_max) + "_" +
+        file = open("data/" + TTS + "/result/estimated/with_classifier_" + str(time_max) + "_" +
                     str(datetime.now()) + ".txt", "w+")
         for k in result.keys():
             if k <= time_max :
                 file.write("%d, %d, %d, %d, %d, %d\n" % (
-                    k, result[k]["number_of_bug"], result[k]["bug_per_asr"][DEEPSPEECH], result[k]["bug_per_asr"][WIT], result[k]["bug_per_asr"][WAV2LETTER], result[k]["bug_per_asr"][PADDLEDEEPSPEECH]))
+                    k, result[k]["number_of_bug"], result[k]["bug_per_asr"][constant.DEEPSPEECH], result[k]["bug_per_asr"][constant.WIT], result[k]["bug_per_asr"][constant.WAV2LETTER], result[k]["bug_per_asr"][constant.PADDLEDEEPSPEECH]))
         
         file.close()
 
@@ -280,6 +249,8 @@ if __name__ == '__main__' :
         start_time = time.time()
         current_bug = 0
         last_time = 0
+        cumulative_time = 0
+
 
         i = 0  # number of texts processed
         j = 0  # number of predicted
@@ -289,9 +260,10 @@ if __name__ == '__main__' :
             case = get_case(cases, data["id"])
             j += 1
             case = get_case(cases, data["id"])
-            if constant.UNDETERMINED_LABEL in case.values():
+            cumulative_time += gt[data["id"]] + get_execution_time(ets, avg, data["id"])
+            if constant.UNDETERMINED_TEST_CASE in case.values():
                 print("Can't determine bug")
-            elif constant.BUG_LABEL not in case.values():
+            elif constant.FAIL_TEST_CASE not in case.values():
                 print("All Speech Recognition can recognize the speech")
             else:
                 # print("\n\n\n")
@@ -301,11 +273,11 @@ if __name__ == '__main__' :
                 # print(case)
                 
                 current_bug += 1
-                time_execution = time.time() - start_time + j * 29.4815
+                time_execution = time.time() - start_time + cumulative_time
                 t = math.ceil(time_execution / 60.0)
                 bug = {}
                 bug["time_execution"] = t
-                bug["number_of_bug"] = list(case.values()).count(constant.BUG_LABEL)
+                bug["number_of_bug"] = list(case.values()).count(constant.FAIL_TEST_CASE)
                 # bug["id_corpus"] = data["id"]
                 for sr in SR:
                     # change the label to make easier in cumulative calculation
@@ -339,12 +311,12 @@ if __name__ == '__main__' :
             last_time = v["time_execution"]
 
 
-        file = open("result/estimated/2_label/without_classifier_" + str(time_max) + "_" +
+        file = open("data/" + TTS + "/result/estimated/without_classifier_" + str(time_max) + "_" +
                     str(datetime.now()) + ".txt", "w+")
         for k in result.keys():
             if k <= time_max:
                 file.write("%d, %d, %d, %d, %d, %d\n" % (
-                    k, result[k]["number_of_bug"], result[k]["bug_per_asr"][DEEPSPEECH], result[k]["bug_per_asr"][WIT], result[k]["bug_per_asr"][WAV2LETTER], result[k]["bug_per_asr"][PADDLEDEEPSPEECH]))
+                    k, result[k]["number_of_bug"], result[k]["bug_per_asr"][constant.DEEPSPEECH], result[k]["bug_per_asr"][constant.WIT], result[k]["bug_per_asr"][constant.WAV2LETTER], result[k]["bug_per_asr"][constant.PADDLEDEEPSPEECH]))
 
         file.close()
     
