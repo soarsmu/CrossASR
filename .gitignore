@@ -152,9 +152,12 @@ verify/
 performance/
 result/
 
+verified/
+europarl-parallel-corpus-19962011/
+corpus/europarl-full.csv
+corpus/reuter-full.csv
+
 sr_alexa/alexa_data/
 sr_alexa/alexa_client/
 
 sr_deepspeech/deepspeech-0.6.1-models/
-
-corpus-sentence.txt
