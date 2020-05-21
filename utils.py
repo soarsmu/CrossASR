@@ -145,10 +145,10 @@ def getResampleSize(df):
 
 def resample_to_fix_number(df, n):
     # Separate majority and minority classes
-    df_bug = df[df.label == constant.DETERMINED_LABEL]
+    df_determined = df[df.label == constant.DETERMINED_TEST_CASE]
     df_undetermined = df[df.label == constant.UNDETERMINED_TEST_CASE]
 
-    df_bug = resample(df_bug,
+    df_determined = resample(df_determined,
                       replace=True,     # sample with replacement
                       n_samples=n,    # to match majority class
                       random_state=123)  # reproducible results
@@ -159,13 +159,13 @@ def resample_to_fix_number(df, n):
                                random_state=123)  # reproducible results
 
     # Combine majority class with upsampled minority class
-    df_resampled = pd.concat([df_undetermined, df_bug])
+    df_resampled = pd.concat([df_undetermined, df_determined])
 
     return df_resampled.copy()
 
 def get_resample_size(df):
     size = 0
-    df_bug = df[df.label == constant.DETERMINED_LABEL]
+    df_bug = df[df.label == constant.DETERMINED_TEST_CASE]
     if (len(df_bug["label"]) > size):
         size = len(df_bug["label"])
 
@@ -193,23 +193,35 @@ def train_classifier(clf, feature_train, labels_train):
 def predict_labels(clf, features):
     return clf.predict(features)
 
-
 def remove_double_space(sentence):
     return re.sub(' +', ' ', sentence)
-
 
 def remove_punctuation(sentence):
     return sentence.translate(str.maketrans('', '', string.punctuation))
 
-
 def normalize_text(sentence):
     return " ".join(normalise(sentence, tokenizer=tokenize_basic, verbose=False))
+
+def substitute_word(sentence):
+    words = sentence.split(" ")
+    preprocessed = []
+    for w in words:
+        substitution = ""
+        if w == "mister":
+            substitution = "mr"
+        elif w == "missus":
+            substitution = "mrs"
+        else:
+            substitution = w
+        preprocessed.append(substitution)
+    return " ".join(preprocessed)
 
 def preprocess_text(text):
     text = text.lower()
     text = remove_punctuation(text)
     text = normalize_text(text)
     text = text.lower()
+    text = substitute_word(text)
     text = remove_double_space(text)
     text = text.strip()  # remove leading trailing space
     return text
