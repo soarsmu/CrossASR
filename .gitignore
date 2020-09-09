@@ -161,3 +161,9 @@ sr_alexa/alexa_data/
 sr_alexa/alexa_client/
 
 sr_deepspeech/deepspeech-0.6.1-models/
+
+models/deepspeech/
+models/DeepSpeech/
+models/wav2letter/
+
+audio/
