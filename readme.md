@@ -22,8 +22,9 @@ pip install gTTS
 
 #### Trial
 ```
-gtts-cli 'hello world' --output audio/hello.mp3
-ffmpeg -i audio/hello.mp3  -acodec pcm_s16le -ac 1 -ar 16000 audio/hello.wav -y
+mkdir audio/google/
+gtts-cli 'hello world google' --output audio/google/hello.mp3
+ffmpeg -i audio/google/hello.mp3  -acodec pcm_s16le -ac 1 -ar 16000 audio/google/hello.wav -y
 ```
 
 ### ResponsiveVoice
@@ -34,17 +35,35 @@ We use [rvTTS](https://pypi.org/project/rvtts/), a cli tool for converting text 
 pip install rvtts
 ```
 
+#### Trial
+```
+mkdir audio/rv/
+rvtts --voice english_us_male --text "hello responsive voice trial" -o audio/rv/hello.mp3
+ffmpeg -i audio/rv/hello.mp3  -acodec pcm_s16le -ac 1 -ar 16000 audio/rv/hello.wav -y
+```
+
 ### Festival
 
 [Festival](http://www.cstr.ed.ac.uk/projects/festival/) is a free TTS written in C++. It is developed by The Centre for Speech Technology Research at the University of Edinburgh. Festival are distributed under an X11-type licence allowing unrestricted commercial and non-commercial use alike. Festival is a command-line program that already installed on Ubuntu 16.04
+
+#### Trial
+```
+mkdir audio/festival/
+festival -b "(utt.save.wave (SayText \"hello festival \") \"audio/festival/hello.wav\" 'riff)"
+```
 
 ### Espeak
 
 [eSpeak](http://espeak.sourceforge.net/) is a compact open source software speech synthesizer for English and other languages.
 
 ```
-sudo apt-get install espeak
+apt-get install espeak
+
+mkdir audio/espeak/
+espeak "hello e speak" --stdout > audio/espeak/hello.wav
+ffmpeg -i audio/espeak/hello.wav  -acodec pcm_s16le -ac 1 -ar 16000 audio/espeak/hello.wav -y
 ```
+
 
 ## ASRs
 
@@ -67,7 +86,7 @@ Please follow [this link for more detailed installation](https://github.com/mozi
 
 #### Trial
 ```
-deepspeech --model models/deepspeech/deepspeech-0.6.1-models/output_graph.pbmm --lm models/deepspeech/deepspeech-0.6.1-models/lm.binary --trie models/deepspeech/deepspeech-0.6.1-models/trie --audio audio/hello.wav
+deepspeech --model models/deepspeech/deepspeech-0.6.1-models/output_graph.pbmm --lm models/deepspeech/deepspeech-0.6.1-models/lm.binary --trie models/deepspeech/deepspeech-0.6.1-models/trie --audio audio/google/hello.wav
 ```
 
 ### Deepspeech2
@@ -143,7 +162,7 @@ Then detach from the docker using ctrl+p & ctrl+q
 #### Run Client from the Terminal (outside docker container)
 
 ```
-docker exec -it deepspeech2 curl http://localhost:5000/transcribe?fpath=audio/example.wav
+docker exec -it deepspeech2 curl http://localhost:5000/transcribe?fpath=audio/google/hello.wav
 ```
 
 ### Wav2letter++
@@ -163,6 +182,7 @@ ls -sh
 cd ../../
 ```
 
+#### Run docker inference for wav2letter
 ```
 docker run --name wav2letter -it --rm -v $(pwd)/audio/:/root/host/audio/ -v $(pwd)/models/:/root/host/models/ --ipc=host -a stdin -a stdout -a stderr wav2letter/wav2letter:inference-latest 
 ```
@@ -171,7 +191,7 @@ Then detach from the docker using ctrl+p & ctrl+q
 #### Run Client from the Terminal (outside docker container)
 
 ```
-docker exec -it wav2letter sh -c "cat /root/host/audio/example.wav | /root/wav2letter/build/inference/inference/examples/simple_streaming_asr_example --input_files_base_path /root/host/models/wav2letter/"
+docker exec -it wav2letter sh -c "cat /root/host/audio/google/hello.wav | /root/wav2letter/build/inference/inference/examples/simple_streaming_asr_example --input_files_base_path /root/host/models/wav2letter/"
 ```
 
 Detail of [wav2letter++ installation](https://github.com/facebookresearch/wav2letter/wiki#Installation) and [wav2letter++ inference](https://github.com/facebookresearch/wav2letter/wiki/Inference-Run-Examples)
@@ -189,4 +209,9 @@ pip install wit
 #### Setup Wit access token
 ```
 export WIT_ACCESS_TOKEN=<your Wit access token>
+```
+
+#### Trial
+```
+python models/wit_trial.py
 ```
