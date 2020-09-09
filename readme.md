@@ -215,3 +215,23 @@ export WIT_ACCESS_TOKEN=<your Wit access token>
 ```
 python models/wit_trial.py
 ```
+
+## Prepare Europarl Data
+#### Download Raw Data from Kaggle
+Download [Eurparl Raw Data](https://www.kaggle.com/djonafegnem/europarl-parallel-corpus-19962011). Then extract it inside the main folder. You will get `europarl-parallel-corpus-19962011/`
+
+#### Requirements
+```
+pip install numpy
+pip install pandas
+pip install scikit-learn
+pip install normalise
+```
+
+#### Generate Corpus
+```
+python generate_experiment_data.py
+```
+This code will generate full europarl corpus `corpus/europarl-full.csv` and 20k texts `corpus/europarl-20k.txt` for our experiment.
+
+We provide `corpus/europarl-20k.txt` on our Github repository. Thus you can skip this step actually. Please check in the folder `corpus/` to make sure the dataset availability.
