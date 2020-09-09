@@ -75,7 +75,6 @@ def generate_reuter_corpus():
     df.to_csv("corpus/reuter-full.csv", index=False)
 
 
-
 if __name__ == "__main__" :
     
     # generate_europarl_corpus()

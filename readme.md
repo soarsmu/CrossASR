@@ -100,7 +100,7 @@ deepspeech --model models/deepspeech/deepspeech-0.6.1-models/output_graph.pbmm -
 ```
 cd models/
 git clone https://github.com/PaddlePaddle/DeepSpeech.git
-cp asset/api.py DeepSpeech/
+cp models/api.py models/DeepSpeech/
 cd DeepSpeech/models/librispeech/
 sh download_model.sh
 cd ../../../../

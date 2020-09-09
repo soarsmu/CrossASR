@@ -10,7 +10,6 @@ import pandas as pd
 from normalise import normalise, tokenize_basic
 
 from sklearn.utils import resample
-from g2p_en import G2p
 
 import constant
 
@@ -23,7 +22,7 @@ def read_data(fpath):
 
 # shuffle data
 def shuffle_data(df):
-    return df.sample(frac=1).reset_index(drop=True)
+    return df.sample(frac=1, random_state=constant.INITAIL_SEED).reset_index(drop=True)
 
 def get_index_in_list_with_have_value(df, value) :
     return np.where(df == value)[0]
@@ -174,18 +173,6 @@ def get_resample_size(df):
 
 def remove_punctuation(sentence):
     return sentence.translate(str.maketrans('', '', string.punctuation))
-
-def text_process(sentence):
-    nopunc = [char for char in sentence if char not in string.punctuation]
-    nopunc = ''.join(nopunc)
-    return [word for word in nopunc.split()]
-
-
-def phoneme_text_process(sentence):
-    g2p = G2p()
-    nopunc = [char for char in sentence if char not in string.punctuation]
-    nopunc = ''.join(nopunc)
-    return g2p(nopunc)
 
 def train_classifier(clf, feature_train, labels_train):    
     clf.fit(feature_train, labels_train)
