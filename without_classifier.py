@@ -1,6 +1,7 @@
 import random
 import queue
 import os
+import sys, getopt
 import subprocess
 import string
 import math
@@ -17,7 +18,7 @@ import constant
 import utils
 
 TTS = constant.TTS
-TTS = [constant.GOOGLE]
+# TTS = [constant.GOOGLE]
 ASR = constant.ASR
 # ASR = [constant.DEEPSPEECH, constant.PADDLEDEEPSPEECH, constant.WAV2LETTER]
 
@@ -73,8 +74,45 @@ def getCase(text, transcriptions) :
     return case
 
 
-if __name__ == "__main__" :
+
+def printHelp() :
+    print('without_classifier.py -s <random seed> -n <number of batch> -b <batch size> -t <batch-time>')
+    print('or')
+    print('without_classifier.py --seed <random seed> --number-of-batch <number of batch> --batch-size <batch size> --batch-time <batch time>')
+
+def main(argv):
+    random_seed = None
+    n_batch = 5
+    batch_size = 210
+    batch_time = 60
     
+    try:
+        opts, args = getopt.getopt(argv,"hs:n:b:t:",["seed=", "number-of-batch=", "batch-size=", "batch-time="])
+    except getopt.GetoptError:
+        printHelp()
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt == '-h':
+            printHelp()
+            sys.exit()
+        elif opt in ("-s", "--seed"):
+            random_seed = int(arg)
+        elif opt in ("-n", "--number-of-batch"):
+            n_batch = int(arg)
+        elif opt in ("-b", "--batch-size"):
+            batch_size = int(arg)
+        elif opt in ("-t", "--batch-time"):
+            batch_time = int(arg)
+        
+    if not random_seed :
+        print("Please specify the seed number")
+        sys.exit()
+    
+#     print("Random seed: ", random_seed)
+#     print("Number of batch:", n_batch)
+#     print("Batch size: ", batch_size)
+#     print("Batch time: ", batch_time)
+
     APPROACH = "without_classifier"
 
     CORPUS_FPATH = "corpus/europarl-20k.txt"
@@ -83,57 +121,51 @@ if __name__ == "__main__" :
     DATASET = "europarl"
 
     for tts in TTS :
-        
-        time_max = 60
 
-        x = 0
-        while x < 3:
-            x += 1
+        corpus = fix_corpus.copy()
 
-            corpus = fix_corpus.copy()
+        # shuffle the data
+        random.seed(random_seed)
+        random.shuffle(corpus)
 
-            # shuffle the data
-            random_seed = constant.INITIAL_SEED + x
-            random.seed(random_seed)
-            random.shuffle(corpus)
+        data = {}
+        for sr in ASR :
+            data[sr] = pd.DataFrame(columns=["sentence", "label"])
 
-            q = queue.Queue()
-            for data in corpus:
-                q.put(data)
+        stat = {}
+        for sr in ASR :
+            stat[sr] = pd.DataFrame(columns=["ftc", "stc", "utc"])
 
+        audio_dir = "audio/%s/%s-%d/%s/" % (APPROACH, DATASET, random_seed, tts)
+        if not os.path.exists(audio_dir):
+            os.makedirs(audio_dir)
 
-            data = {}
-            for sr in ASR :
-                data[sr] = pd.DataFrame(columns=["sentence", "label"])
-
-            stat = {}
-            for sr in ASR :
-                stat[sr] = pd.DataFrame(columns=["ftc", "stc", "utc"])
-
-            n_batch = 5
-            i_batch = 0
-
-            training_time = 0
+        i_batch = 0
+        while i_batch < n_batch :
             
-            audio_dir = "audio/%s/%s-%d/%s/" % (APPROACH, DATASET, random_seed, tts)
-            if not os.path.exists(audio_dir):
-                os.makedirs(audio_dir)
+            curr_data = {}
+            for sr in ASR :
+                curr_data[sr] = pd.DataFrame(columns=["sentence", "label"])
+            
+            lower_bound = i_batch * batch_size 
+            upper_bound = (i_batch + 1) * batch_size
+            
+            i_batch += 1 
+            
+            if lower_bound < len(corpus) :
                 
-
-            while i_batch < n_batch :
-                i_batch += 1 
-
+                if upper_bound > len(corpus)-1 :
+                    upper_bound = len(corpus)-1
+            
+                q = queue.Queue()
+                for instance in corpus[lower_bound:upper_bound]:
+                    q.put(instance)
+                    
                 start_time = time.time()
                 last_time = 0
-                
 
-                curr_data = {}
-                for sr in ASR :
-                    curr_data[sr] = pd.DataFrame(columns=["sentence", "label"])
-
-                while (not q.empty() and last_time <= time_max):
+                while (not q.empty() and last_time <= batch_time):
                     instance = q.get()
-#                     print("instance: ", instance)
                     fpath = audio_dir + "audio-" + str(instance["id"]) + ".wav"
                     generateSpeech(tts, instance["sentence"], fpath)
                     transcriptions = recognizeSpeech(tts, fpath)
@@ -143,7 +175,7 @@ if __name__ == "__main__" :
                             {"sentence": instance["sentence"],
                                 "label": case[sr]},
                             ignore_index=True)
-                    
+
                     time_execution = time.time() - start_time
                     last_time = math.ceil(time_execution / 60.0)
 
@@ -157,20 +189,16 @@ if __name__ == "__main__" :
                                 ignore_index=True)
 
                     data[sr] = data[sr].append(curr_data[sr])
-
-
-                for sr in ASR :
                     data[sr] = data[sr].reset_index(drop=True)    
 
-            for sr in ASR :
-                data[sr] = data[sr].reset_index(drop=True)
+        # save the result
+        for sr in ASR :
+            fpath = "result/%s/%s-%d/%s/%s/" % (APPROACH, DATASET, random_seed, tts, sr)
+            if not os.path.exists(fpath):
+                os.makedirs(fpath)
+            stat[sr].to_csv(fpath + "statistic.csv", index=False)
+            data[sr].to_csv(fpath + "data.csv", index=False)
+#             print(stat[sr])
 
-            # save the result
-            for sr in ASR :
-                fpath = "result/%s/%s-%d/%s/%s/" % (APPROACH, DATASET, random_seed, tts, sr)
-                if not os.path.exists(fpath):
-                    os.makedirs(fpath)
-                stat[sr].to_csv(fpath + "statistic.csv", index=False)
-                data[sr].to_csv(fpath + "data.csv", index=False)
-                print(stat[sr])
-
+if __name__ == "__main__":
+    main(sys.argv[1:])
