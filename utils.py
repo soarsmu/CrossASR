@@ -8,7 +8,7 @@ import subprocess
 import numpy as np
 import pandas as pd
 
-# from normalise import normalise, tokenize_basic
+from normalise import normalise, tokenize_basic
 
 from gtts import gTTS
 
