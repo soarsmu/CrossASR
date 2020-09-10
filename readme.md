@@ -216,6 +216,30 @@ export WIT_ACCESS_TOKEN=<your Wit access token>
 python models/wit_trial.py
 ```
 
+## Python Interface for TTSes and ASRs
+
+### TTS
+
+```
+python trial.py -t <tts> -o audio/<tts>/icsme.wav
+```
+
+**Example on Google**
+```
+python trial.py -t google -o audio/google/icsme.wav
+```
+
+
+### ASR
+```
+python trial.py -a <asr> -i audio/<asr>/icsme.wav
+```
+**Example on Deepspeech2**
+```
+python trial.py -a paddledeepspeech -i audio/google/icsme.wav
+```
+
+
 ## Prepare Europarl Data
 #### Download Raw Data from Kaggle
 Download [Eurparl Raw Data](https://www.kaggle.com/djonafegnem/europarl-parallel-corpus-19962011). Then extract it inside the main folder. You will get `europarl-parallel-corpus-19962011/`

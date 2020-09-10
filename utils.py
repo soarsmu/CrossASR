@@ -1,18 +1,24 @@
-import os
+import os, sys
 import re
 import string
 from datetime import datetime
 import math
+import subprocess
 
 import numpy as np
 import pandas as pd
 
-from normalise import normalise, tokenize_basic
+# from normalise import normalise, tokenize_basic
 
-from sklearn.utils import resample
+from gtts import gTTS
+
+from wit import Wit
 
 import constant
 
+
+WIT_ACCESS_TOKEN = os.getenv("WIT_ACCESS_TOKEN")
+wit_client = Wit(WIT_ACCESS_TOKEN)
 
 # read data
 def read_data(fpath):
@@ -35,141 +41,6 @@ def intersection(lst1, lst2):
 # union between two sets
 def union(set1, set2):
     return list(set().union(set1, set2))
-
-
-def get_fail_test_case(df, column_name="label"):
-    bugs = []
-    non_bugs = []
-
-    for key in df.keys():
-        bugs = union(bugs, get_index_in_list_with_have_value(
-            df[key][column_name], constant.FAIL_TEST_CASE))
-        non_bugs = union(non_bugs, get_index_in_list_with_have_value(
-            df[key][column_name], constant.SUCCESS_TEST_CASE))
-
-    fail_test_case = intersection(bugs, non_bugs)
-    
-    return fail_test_case
-
-def get_success_test_case(df, column_name="label"):
-    bugs = []
-    non_bugs = []
-
-    for key in df.keys():
-        bugs = union(bugs, get_index_in_list_with_have_value(
-            df[key][column_name], constant.FAIL_TEST_CASE))
-        non_bugs = union(non_bugs, get_index_in_list_with_have_value(
-            df[key][column_name], constant.SUCCESS_TEST_CASE))
-    
-    success_test_case = []
-    for id in non_bugs:
-        if id not in bugs:
-            success_test_case.append(id)
-
-    return success_test_case
-
-
-def upsampleMinority(df):
-    # Separate majority and minority classes
-    df_majority = df[df.label == constant.SUCCESS_TEST_CASE]
-    df_minority = df[df.label == constant.FAIL_TEST_CASE]
-
-    # Upsample minority class
-    df_minority_upsampled = resample(df_minority,
-                                     replace=True,     # sample with replacement
-                                     # to match majority class
-                                     n_samples=len(df_majority),
-                                     random_state=123)  # reproducible results
-
-    # Combine majority class with upsampled minority class
-    df_upsampled = pd.concat([df_majority, df_minority_upsampled])
-
-    return df_upsampled.copy()
-
-
-def downsampleMajority(df):
-    # Separate majority and minority classes
-    df_majority = df[df.label == constant.SUCCESS_TEST_CASE]
-    df_minority = df[df.label == constant.FAIL_TEST_CASE]
-
-    # Downsample majority class
-    df_majority_downsampled = resample(df_majority,
-                                       replace=True,     # sample with replacement
-                                       # to match minority class
-                                       n_samples=len(df_minority),
-                                       random_state=123)  # reproducible results
-
-    # Combine majority class with upsampled minority class
-    df_resampled = pd.concat([df_majority_downsampled, df_minority])
-
-    return df_resampled.copy()
-
-
-def resampleToFixNumber(df, n):
-    # Separate majority and minority classes
-    df_non_bug = df[df.label == constant.SUCCESS_TEST_CASE]
-    df_bug = df[df.label == constant.FAIL_TEST_CASE]
-    df_undetermined = df[df.label == constant.UNDETERMINED_TEST_CASE]
-
-    df_non_bug = resample(df_non_bug,
-                          replace=True,     # sample with replacement
-                          n_samples=n,    # to match minority class
-                          random_state=123)  # reproducible results
-
-    df_bug = resample(df_bug,
-                      replace=True,     # sample with replacement
-                      n_samples=n,    # to match majority class
-                      random_state=123)  # reproducible results
-
-    df_undetermined = resample(df_undetermined,
-                               replace=True,     # sample with replacement
-                               n_samples=n,    # to match majority class
-                               random_state=123)  # reproducible results
-
-    # Combine majority class with upsampled minority class
-    df_resampled = pd.concat([df_undetermined, df_bug, df_non_bug])
-
-    return df_resampled.copy()
-
-
-def getResampleSize(df):
-    size = 0
-    for k in df.keys():
-        df_bug = df[k][df[k].label == constant.FAIL_TEST_CASE]
-        if (len(df_bug["label"]) > size):
-            size = len(df_bug["label"])
-
-    return size
-
-
-def resample_to_fix_number(df, n):
-    # Separate majority and minority classes
-    df_determined = df[df.label == constant.DETERMINED_TEST_CASE]
-    df_undetermined = df[df.label == constant.UNDETERMINED_TEST_CASE]
-
-    df_determined = resample(df_determined,
-                      replace=True,     # sample with replacement
-                      n_samples=n,    # to match majority class
-                      random_state=123)  # reproducible results
-
-    df_undetermined = resample(df_undetermined,
-                               replace=True,     # sample with replacement
-                               n_samples=n,    # to match majority class
-                               random_state=123)  # reproducible results
-
-    # Combine majority class with upsampled minority class
-    df_resampled = pd.concat([df_undetermined, df_determined])
-
-    return df_resampled.copy()
-
-def get_resample_size(df):
-    size = 0
-    df_bug = df[df.label == constant.DETERMINED_TEST_CASE]
-    if (len(df_bug["label"]) > size):
-        size = len(df_bug["label"])
-
-    return size
-
 
 def remove_punctuation(sentence):
     return sentence.translate(str.maketrans('', '', string.punctuation))
@@ -214,3 +85,161 @@ def preprocess_text(text):
     text = remove_double_space(text)
     text = text.strip()  # remove leading trailing space
     return text
+
+def synthesizeSpeech(tts, text, fpath) :
+    if fpath[-3:] != "wav" :
+        print("File path must be ended with .wav")
+        sys.exit()
+        
+    if tts in constant.TTS :
+        if tts == constant.GOOGLE :
+            googleSynthesize(text, fpath)
+        elif tts == constant.RV :
+            responsiveVoiceSynthesize(text, fpath)
+        elif tts == constant.FESTIVAL :
+            festivalSynthesize(text, fpath)
+        elif tts == constant.ESPEAK :
+            espeakSynthesize(text, fpath)
+        else :
+            print("TTS is not detected!")
+            sys.exit()
+    else :
+        print("TTS is not available")
+        sys.ext()
+            
+def googleSynthesize(text, fpath) :
+    mp3file = fpath[:-3] + "mp3"
+    wavfile = fpath
+    googleTTS = gTTS(text, lang='en-us')
+    googleTTS.save(mp3file)
+    os.system('ffmpeg -i $(pwd)/' + mp3file + ' -acodec pcm_s16le -ac 1 -ar 16000 $(pwd)/' + wavfile + ' -y')
+    
+    
+def responsiveVoiceSynthesize(text, fpath) :
+    base_folder = "$(pwd)/"
+    mp3file = base_folder + fpath[:-3] + "mp3"
+    wavfile = base_folder + fpath
+
+    cmd = "rvtts --voice english_us_male --text \"" + text + "\" -o " + mp3file
+    
+    os.system(cmd)
+    os.system('ffmpeg -i ' + mp3file +
+            ' -acodec pcm_s16le -ac 1 -ar 16000 ' + wavfile + ' -y')
+
+    
+def festivalSynthesize(text, fpath) :    
+    wavfile = "$(pwd)/" + fpath
+    cmd = "festival -b \"(utt.save.wave (SayText \\\"" + \
+        text + "\\\") \\\"" + wavfile + "\\\" 'riff)\""
+    
+    os.system(cmd)
+
+def espeakSynthesize(text, fpath) :
+    wavfile = "$(pwd)/" + fpath
+    cmd = "espeak \"" + text + "\" --stdout > " + wavfile
+    # print(cmd)
+    os.system(cmd)
+    os.system('ffmpeg -i ' + wavfile +
+                ' -acodec pcm_s16le -ac 1 -ar 16000 ' + wavfile + ' -y')
+    
+    
+def recognizeSpeech(asr, fpath) :
+    if not os.path.exists(fpath) :
+        print("Audio file doesn't exist")
+        sys.exit()
+        
+    transcription = ""
+    if asr in constant.ASR :
+        if asr == constant.DEEPSPEECH :
+            transcription = deepspeechRecognize(fpath)
+        elif asr == constant.PADDLEDEEPSPEECH :
+            transcription = paddledeepspeechRecognize(fpath)
+        elif asr == constant.WIT :
+            transcription = witRecognize(fpath)
+        elif asr == constant.WAV2LETTER :
+            transcription = wav2letterRecognize(fpath)
+        else :
+            print("ASR is not detected!")
+            sys.exit()
+    else :
+        print("ASR not available!")
+        sys.ext()
+        
+    return transcription
+
+    
+def deepspeechRecognize(fpath):
+    cmd = "deepspeech --model models/deepspeech/deepspeech-0.6.1-models/output_graph.pbmm --lm models/deepspeech/deepspeech-0.6.1-models/lm.binary --trie models/deepspeech/deepspeech-0.6.1-models/trie --audio " + fpath
+
+    proc = subprocess.Popen([cmd], stdout=subprocess.PIPE, shell=True)
+    (out, err) = proc.communicate()
+
+    transcription = out.decode("utf-8")
+#     print("DeepSpeech transcription: %s" % transcription)
+
+    return transcription[:-1]
+
+
+def paddledeepspeechRecognize(fpath):
+    cmd = "docker exec -it deepspeech2 curl http://localhost:5000/transcribe?fpath=" + fpath
+
+    proc = subprocess.Popen([cmd], stdout=subprocess.PIPE, shell=True)
+    (out, err) = proc.communicate()
+
+    transcription = out.decode("utf-8").split("\n")[-2]
+
+#     print("DeepSpeech2 transcription: %s" % transcription)
+
+    return transcription[:-1]
+
+
+def wav2letterRecognize(fpath):
+    
+    cmd = "docker exec -it wav2letter sh -c \"cat /root/host/" + fpath + " | /root/wav2letter/build/inference/inference/examples/simple_streaming_asr_example --input_files_base_path /root/host/models/wav2letter/\""
+
+    proc = subprocess.Popen([cmd],
+                            stdout=subprocess.PIPE, shell=True)
+    (out, err) = proc.communicate()
+    
+    transcription = concatWav2letterTranscription(out)
+
+    return transcription
+
+
+def concatWav2letterTranscription(out):
+    lines = out.splitlines()[21:-2]
+#     print(lines)
+    transcription = ""
+
+    j = 0
+    for line in lines:
+        line = line.decode()
+        part = line.split(",")[-1]
+        if part != "":
+            transcription += part
+
+    transcription = transcription[:-1]
+
+    return transcription
+
+
+def witRecognize(fpath):
+    
+    transcription = ""
+    with open(fpath, 'rb') as audio:
+        try:
+            transcription = None
+            transcription = wit_client.speech(audio, None, {'Content-Type': 'audio/wav'})
+
+            if transcription != None:
+                if "text" in transcription:
+                    transcription = str(transcription["text"])
+                else:
+                    return ""
+            else:
+                return ""
+        except Exception as e:
+#             print("Could not request results from Wit.ai service; {0}".format(e))
+            return ""
+
+    return transcription
