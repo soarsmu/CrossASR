@@ -105,7 +105,7 @@ def synthesizeSpeech(tts, text, fpath) :
             sys.exit()
     else :
         print("TTS is not available")
-        sys.ext()
+        sys.exit()
             
 def googleSynthesize(text, fpath) :
     mp3file = fpath[:-3] + "mp3"
@@ -146,7 +146,7 @@ def espeakSynthesize(text, fpath) :
 def recognizeSpeech(asr, fpath) :
     if not os.path.exists(fpath) :
         print("Audio file doesn't exist")
-        sys.exit()
+        return ""
         
     transcription = ""
     if asr in constant.ASR :
@@ -158,12 +158,9 @@ def recognizeSpeech(asr, fpath) :
             transcription = witRecognize(fpath)
         elif asr == constant.WAV2LETTER :
             transcription = wav2letterRecognize(fpath)
-        else :
-            print("ASR is not detected!")
-            sys.exit()
     else :
         print("ASR not available!")
-        sys.ext()
+        sys.exit()
         
     return transcription
 
@@ -243,3 +240,7 @@ def witRecognize(fpath):
             return ""
 
     return transcription
+
+def isEmptyFile(fpath) :
+    filesize = os.path.getsize(fpath)    
+    return filesize == 0
