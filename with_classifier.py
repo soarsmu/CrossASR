@@ -171,10 +171,7 @@ def main(argv):
 
     APPROACH = "with_classifier"
 
-    CORPUS_FPATH = "corpus/europarl-20k.txt"
-    fix_corpus = getCorpus(CORPUS_FPATH)
-
-    DATASET = "europarl"
+    fix_corpus = getCorpus(constant.CORPUS_FPATH)
 
     for tts in TTS :
         
@@ -208,7 +205,7 @@ def main(argv):
         for sr in ASR :
             stat[sr] = pd.DataFrame(columns=["ftc", "stc", "utc"])
 
-        audio_dir = "audio/%s/%s-%d/%s/" % (APPROACH, DATASET, random_seed, tts)
+        audio_dir = "audio/%s/%s-%d/%s/" % (APPROACH, constant.DATASET, random_seed, tts)
         if not os.path.exists(audio_dir):
             os.makedirs(audio_dir)
 
@@ -309,7 +306,7 @@ def main(argv):
         
         # save the result
         for sr in ASR :
-            fpath = "result/%s/%s-%d/%s/%s/" % (APPROACH, DATASET, random_seed, tts, sr)
+            fpath = "result/%s/%s-%d/%s/%s/" % (APPROACH, constant.DATASET, random_seed, tts, sr)
             if not os.path.exists(fpath):
                 os.makedirs(fpath)
             stat[sr].to_csv(fpath + "statistic.csv", index=False)
