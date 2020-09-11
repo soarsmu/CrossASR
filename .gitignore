@@ -166,4 +166,12 @@ models/deepspeech/
 models/DeepSpeech/
 models/wav2letter/
 
-audio/
+# ignore classifier models etc
+models/albert/
+cache_dir/
+runs/
+
+wandb/
+
+audio/with_classifier/
+audio/without_classifier/
