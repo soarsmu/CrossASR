@@ -146,7 +146,7 @@ def espeakSynthesize(text, fpath) :
 def recognizeSpeech(asr, fpath) :
     if not os.path.exists(fpath) :
         print("Audio file doesn't exist")
-        sys.exit()
+        return ""
         
     transcription = ""
     if asr in constant.ASR :
@@ -158,9 +158,6 @@ def recognizeSpeech(asr, fpath) :
             transcription = witRecognize(fpath)
         elif asr == constant.WAV2LETTER :
             transcription = wav2letterRecognize(fpath)
-        else :
-            print("ASR is not detected!")
-            sys.exit()
     else :
         print("ASR not available!")
         sys.exit()
