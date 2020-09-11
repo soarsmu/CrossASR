@@ -144,7 +144,6 @@ docker pull paddlepaddle/paddle:1.6.2-gpu-cuda10.0-cudnn7
 # please remove --gpus '"device=1"' if you only have one gpu
 docker run --name deepspeech2 --rm --gpus '"device=1"' -it -v $(pwd)/models/DeepSpeech:/DeepSpeech -v $(pwd)/audio/:/DeepSpeech/audio/ -v $(pwd)/data/:/DeepSpeech/data/ paddlepaddle/paddle:1.6.2-gpu-cuda10.0-cudnn7 /bin/bash
 
-
 apt-get update
 apt-get install git -y
 cd DeepSpeech
@@ -177,7 +176,7 @@ sh setup.sh
 cd ../../
 ```
 
-
+#### Run Deepspeech2 as an API (inside docker container)
 ```
 pip install flask 
 
@@ -212,13 +211,13 @@ ls -sh
 cd ../../
 ```
 
-#### Run docker inference for wav2letter
+#### Run docker inference API
 ```
 docker run --name wav2letter -it --rm -v $(pwd)/audio/:/root/host/audio/ -v $(pwd)/models/:/root/host/models/ --ipc=host -a stdin -a stdout -a stderr wav2letter/wav2letter:inference-latest 
 ```
 Then detach from the docker using ctrl+p & ctrl+q 
 
-#### Run Client from the Terminal (outside docker container)
+#### Run Client from the Terminal
 
 ```
 docker exec -it wav2letter sh -c "cat /root/host/audio/google/hello.wav | /root/wav2letter/build/inference/inference/examples/simple_streaming_asr_example --input_files_base_path /root/host/models/wav2letter/"
@@ -269,13 +268,31 @@ Content-Length: 85
 }
 ```
 
-
 #### Trial
 ```
 python models/wit_trial.py
 ```
 
 ## Python Interface for TTSes and ASRs
+
+
+#### Requirements
+
+```
+pip install numpy
+pip install pandas
+pip install scikit-learn
+pip install normalise
+```
+
+`normalise` has several nltk data dependencies. Install these by running the following python commands (**inside python**):
+
+```python
+import nltk
+for dependency in ("brown", "names", "wordnet", "averaged_perceptron_tagger", "universal_tagset"):
+    nltk.download(dependency)
+```
+
 
 ### TTS
 
@@ -303,14 +320,6 @@ python trial.py -a paddledeepspeech -i audio/google/icsme.wav
 #### Download Raw Data from Kaggle
 Download [Eurparl Raw Data](https://www.kaggle.com/djonafegnem/europarl-parallel-corpus-19962011). Then extract it inside the main folder. You will get `europarl-parallel-corpus-19962011/`
 
-#### Requirements
-```
-pip install numpy
-pip install pandas
-pip install scikit-learn
-pip install normalise
-```
-
 #### Generate Corpus
 ```
 python generate_experiment_data.py
@@ -318,3 +327,11 @@ python generate_experiment_data.py
 This code will generate full europarl corpus `corpus/europarl-full.csv` and 20k texts `corpus/europarl-20k.txt` for our experiment.
 
 We provide `corpus/europarl-20k.txt` on our Github repository. Thus you can skip this step actually. Please check in the folder `corpus/` to make sure the dataset availability.
+
+## Run Without Classifier
+
+```
+sh run_without_classifier.sh
+```
+
+
