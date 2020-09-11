@@ -360,7 +360,7 @@ python try_classifier.py
 sh run_with_classifier.sh
 ```
 
-## Process 20k Texts
+## Process 20k Texts (RQ3)
 
 ### Generate Audio File
 
@@ -374,7 +374,7 @@ python generate_audio.py --tts <tts name> --output-dir <output dir location> --l
 python generate_audio.py --tts google --output-dir audio/data/ --lower-bound 0 --upper-bound 20000
 ```
 
-#### Recognize Audio File
+### Recognize Audio File
 
 **Template**
 ```
