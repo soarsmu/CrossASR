@@ -28,7 +28,7 @@ def read_data(fpath):
 
 # shuffle data
 def shuffle_data(df):
-    return df.sample(frac=1, random_state=constant.INITAIL_SEED).reset_index(drop=True)
+    return df.sample(frac=1, random_state=constant.INITIAL_SEED).reset_index(drop=True)
 
 def get_index_in_list_with_have_value(df, value) :
     return np.where(df == value)[0]
