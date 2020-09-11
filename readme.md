@@ -360,4 +360,30 @@ python try_classifier.py
 sh run_with_classifier.sh
 ```
 
+## Process 20k Texts
+
+### Generate Audio File
+
+**Template**
+```
+python generate_audio.py --tts <tts name> --output-dir <output dir location> --lower-bound <lower bound id> --upper-bound <upper bound id>
+```
+
+**Example**
+```
+python generate_audio.py --tts google --output-dir audio/data/ --lower-bound 0 --upper-bound 20000
+```
+
+#### Recognize Audio File
+
+**Template**
+```
+python recognize_audio.py --tts <tts name> --asr <asr name> --input-dir <input audio dir location> --output-dir <output transcription dir location> --lower-bound <lower bound id> --upper-bound <upper bound id>
+```
+
+**Example**
+```
+python recognize_audio.py --tts google --asr paddledeepspeech --input-dir audio/data/ --output-dir transcription/ --lower-bound 0 --upper-bound 20000
+```
+
 
