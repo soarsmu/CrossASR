@@ -47,6 +47,7 @@ pip install gTTS
 
 #### Trial
 ```
+mkdir audio/
 mkdir audio/google/
 gtts-cli 'hello world google' --output audio/google/hello.mp3
 ffmpeg -i audio/google/hello.mp3  -acodec pcm_s16le -ac 1 -ar 16000 audio/google/hello.wav -y
@@ -73,6 +74,7 @@ ffmpeg -i audio/rv/hello.mp3  -acodec pcm_s16le -ac 1 -ar 16000 audio/rv/hello.w
 
 #### Trial
 ```
+sudo apt install festival
 mkdir audio/festival/
 festival -b "(utt.save.wave (SayText \"hello festival \") \"audio/festival/hello.wav\" 'riff)"
 ```
@@ -82,7 +84,7 @@ festival -b "(utt.save.wave (SayText \"hello festival \") \"audio/festival/hello
 [eSpeak](http://espeak.sourceforge.net/) is a compact open source software speech synthesizer for English and other languages.
 
 ```
-apt-get install espeak
+sudo apt install espeak
 
 mkdir audio/espeak/
 espeak "hello e speak" --stdout > audio/espeak/hello.wav
@@ -97,8 +99,13 @@ ffmpeg -i audio/espeak/hello.wav  -acodec pcm_s16le -ac 1 -ar 16000 audio/espeak
 [DeepSpeech](https://github.com/mozilla/DeepSpeech) is an open source Speech-To-Text engine, using a model trained by machine learning techniques based on [Baidu's Deep Speech research paper](https://arxiv.org/abs/1412.5567). **CrossASR uses [Deepspeech-0.6.1](https://github.com/mozilla/DeepSpeech/tree/v0.6.1)**
 
 ```
-pip3 install deepspeech
-mkdir models
+pip install deepspeech===0.6.1
+
+if [ ! -d "models/" ]
+then 
+    mkdir models
+fi
+
 cd models
 mkdir deepspeech
 cd deepspeech 
@@ -125,7 +132,7 @@ deepspeech --model models/deepspeech/deepspeech-0.6.1-models/output_graph.pbmm -
 ```
 cd models/
 git clone https://github.com/PaddlePaddle/DeepSpeech.git
-cp models/api.py models/DeepSpeech/
+cp deepspeech2-api.py DeepSpeech/
 cd DeepSpeech/models/librispeech/
 sh download_model.sh
 cd ../../../../
@@ -134,7 +141,9 @@ sh download_lm_en.sh
 cd ../../../../
 docker pull paddlepaddle/paddle:1.6.2-gpu-cuda10.0-cudnn7
 
+# please remove --gpus '"device=1"' if you only have one gpu
 docker run --name deepspeech2 --rm --gpus '"device=1"' -it -v $(pwd)/models/DeepSpeech:/DeepSpeech -v $(pwd)/audio/:/DeepSpeech/audio/ -v $(pwd)/data/:/DeepSpeech/data/ paddlepaddle/paddle:1.6.2-gpu-cuda10.0-cudnn7 /bin/bash
+
 
 apt-get update
 apt-get install git -y
@@ -144,6 +153,8 @@ apt-get install libsndfile1-dev -y
 ``` 
 
 **in case you found error when running the `setup.sh`**
+
+Error solution for `ImportError: No module named swig_decoders`
 ```
 pip install paddlepaddle-gpu==1.6.2.post107
 cd DeepSpeech
@@ -155,7 +166,7 @@ pip install python_speech_features
 wget http://prdownloads.sourceforge.net/swig/swig-3.0.12.tar.gz
 tar xvzf swig-3.0.12.tar.gz
 cd swig-3.0.12
-apt-get install automake
+apt-get install automake -y 
 ./autogen.sh
 ./configure
 make
@@ -166,23 +177,17 @@ sh setup.sh
 cd ../../
 ```
 
-**download test data for warming up**
-```
-cd examples/tiny/
-sh run_data.sh
-```
 
 ```
-pip install flask
-python api.py
+pip install flask 
 
-CUDA_VISIBLE_DEVICES=0 python api.py \
+CUDA_VISIBLE_DEVICES=0 python deepspeech2-api.py \
     --mean_std_path='models/librispeech/mean_std.npz' \
     --vocab_path='models/librispeech/vocab.txt' \
     --model_path='models/librispeech' \
     --lang_model_path='models/lm/common_crawl_00.prune01111.trie.klm'
 ```
-Then detach from the docker using ctrl+p & ctrl+q
+Then detach from the docker using ctrl+p & ctrl+q after you see `Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)`
 
 #### Run Client from the Terminal (outside docker container)
 
@@ -228,13 +233,42 @@ Detail of [wav2letter++ installation](https://github.com/facebookresearch/wav2le
 
 #### install pywit
 ```
-pip install wit
+pip install wit===5.8.1
 ```
 
 #### Setup Wit access token
 ```
 export WIT_ACCESS_TOKEN=<your Wit access token>
 ```
+
+#### Check using HTTP API
+```
+curl -XPOST 'https://api.wit.ai/speech?' \
+    -i -L \
+    -H "Authorization: Bearer $WIT_ACCESS_TOKEN" \
+    -H "Content-Type: audio/wav" \
+    --data-binary "@audio/google/hello.wav"
+```
+
+**Success Response**
+```
+HTTP/1.1 100 Continue
+Date: Fri, 11 Sep 2020 05:55:51 GMT
+
+HTTP/1.1 200 OK
+Content-Type: application/json
+Date: Fri, 11 Sep 2020 05:55:52 GMT
+Connection: keep-alive
+Content-Length: 85
+
+{
+  "entities": {},
+  "intents": [],
+  "text": "hello world google",
+  "traits": {}
+}
+```
+
 
 #### Trial
 ```
