@@ -317,21 +317,43 @@ python trial.py -a paddledeepspeech -i audio/google/icsme.wav
 
 
 ## Prepare Europarl Data
-#### Download Raw Data from Kaggle
+
+We already provided `corpus/europarl-20k.txt` on our Github repository. Thus you can skip this step actually. Please check in the folder `corpus/` to make sure the dataset availability.
+
+If you wanna reproduce how to generate dataset, please follow the next steps
+
+#### 1. Download Raw Data from Kaggle
 Download [Eurparl Raw Data](https://www.kaggle.com/djonafegnem/europarl-parallel-corpus-19962011). Then extract it inside the main folder. You will get `europarl-parallel-corpus-19962011/`
 
-#### Generate Corpus
+#### 2. Generate Corpus
 ```
 python generate_experiment_data.py
 ```
 This code will generate full europarl corpus `corpus/europarl-full.csv` and 20k texts `corpus/europarl-20k.txt` for our experiment.
 
-We provide `corpus/europarl-20k.txt` on our Github repository. Thus you can skip this step actually. Please check in the folder `corpus/` to make sure the dataset availability.
 
-## Run Without Classifier
+
+## Run Without Classifier (RQ1 and RQ2)
 
 ```
 sh run_without_classifier.sh
+```
+
+## Run With Classifier (RQ2)
+
+#### Setup Classifier
+
+```
+pip install torch
+pip install simpletransformers
+```
+#### Trial
+```
+python try_classifier.py
+```
+#### Run
+```
+sh run_with_classifier.sh
 ```
 
 
