@@ -10,9 +10,34 @@ To deal with the aforementioned challenge, in this work, we propose CrossASR, an
 We evaluated the performance of CrossASR on 20,000 English texts (i.e., sentences) in the [Europarl corpus](https://www.statmt.org/europarl/). We use 4 TTSes (i.e., [Google](https://cloud.google.com/text-to-speech), [ResponsiveVoice](https://responsivevoice.org/), [Festival](http://www.cstr.ed.ac.uk/projects/festival/), and [Espeak](http://espeak.sourceforge.net/)) and 4 ASRs (i.e., [Deepspeech](https://github.com/mozilla/DeepSpeech), [Deepspeech2](https://github.com/PaddlePaddle/DeepSpeech), [wav2letter++](https://github.com/facebookresearch/wav2letter), and [wit](https://wit.ai/)). We use more than one TTS to avoid bias that comes from a particular TTS.
 
 
+## Prepare Virtual Environment
+
+
+### 1. Install the Python development environment on your system
+
+```
+sudo apt update
+sudo apt install python3-dev python3-pip python3-venv
+```
+
+### 2. Create a virtual environment
+
+Create a new virtual environment by choosing a Python interpreter and making a ./env directory to hold it:
+
+```
+python3 -m venv --system-site-packages ./env
+```
+
+Activate the virtual environment using a shell-specific command:
+
+```
+source ./env/bin/activate  # sh, bash, or zsh
+```
+
+
 ## TTSes
 
-### Google
+### 1. Google
 
 We use [gTTS](https://pypi.org/project/gTTS/) (Google Text-to-Speech), a Python library and CLI tool to interface with Google Translate text-to-speech API.
 
@@ -27,7 +52,7 @@ gtts-cli 'hello world google' --output audio/google/hello.mp3
 ffmpeg -i audio/google/hello.mp3  -acodec pcm_s16le -ac 1 -ar 16000 audio/google/hello.wav -y
 ```
 
-### ResponsiveVoice
+### 2. ResponsiveVoice
 
 We use [rvTTS](https://pypi.org/project/rvtts/), a cli tool for converting text to mp3 files using ResponsiveVoice's API.
 
@@ -42,7 +67,7 @@ rvtts --voice english_us_male --text "hello responsive voice trial" -o audio/rv/
 ffmpeg -i audio/rv/hello.mp3  -acodec pcm_s16le -ac 1 -ar 16000 audio/rv/hello.wav -y
 ```
 
-### Festival
+### 3. Festival
 
 [Festival](http://www.cstr.ed.ac.uk/projects/festival/) is a free TTS written in C++. It is developed by The Centre for Speech Technology Research at the University of Edinburgh. Festival are distributed under an X11-type licence allowing unrestricted commercial and non-commercial use alike. Festival is a command-line program that already installed on Ubuntu 16.04
 
@@ -52,7 +77,7 @@ mkdir audio/festival/
 festival -b "(utt.save.wave (SayText \"hello festival \") \"audio/festival/hello.wav\" 'riff)"
 ```
 
-### Espeak
+### 4. Espeak
 
 [eSpeak](http://espeak.sourceforge.net/) is a compact open source software speech synthesizer for English and other languages.
 
@@ -67,7 +92,7 @@ ffmpeg -i audio/espeak/hello.wav  -acodec pcm_s16le -ac 1 -ar 16000 audio/espeak
 
 ## ASRs
 
-### Deepspeech
+### 1. Deepspeech
 
 [DeepSpeech](https://github.com/mozilla/DeepSpeech) is an open source Speech-To-Text engine, using a model trained by machine learning techniques based on [Baidu's Deep Speech research paper](https://arxiv.org/abs/1412.5567). **CrossASR uses [Deepspeech-0.6.1](https://github.com/mozilla/DeepSpeech/tree/v0.6.1)**
 
@@ -89,7 +114,7 @@ Please follow [this link for more detailed installation](https://github.com/mozi
 deepspeech --model models/deepspeech/deepspeech-0.6.1-models/output_graph.pbmm --lm models/deepspeech/deepspeech-0.6.1-models/lm.binary --trie models/deepspeech/deepspeech-0.6.1-models/trie --audio audio/google/hello.wav
 ```
 
-### Deepspeech2
+### 2. Deepspeech2
 
 [DeepSpeech2](https://github.com/PaddlePaddle/DeepSpeech) is an open-source implementation of end-to-end Automatic Speech Recognition (ASR) engine, based on [Baidu's Deep Speech 2 paper](http://proceedings.mlr.press/v48/amodei16.pdf), with [PaddlePaddle](https://github.com/PaddlePaddle/Paddle) platform.
 
@@ -165,7 +190,7 @@ Then detach from the docker using ctrl+p & ctrl+q
 docker exec -it deepspeech2 curl http://localhost:5000/transcribe?fpath=audio/google/hello.wav
 ```
 
-### Wav2letter++
+### 3. Wav2letter++
 
 [wav2letter++](https://github.com/facebookresearch/wav2letter) is a highly efficient end-to-end automatic speech recognition (ASR) toolkit written entirely in C++ by Facebook Research, leveraging ArrayFire and flashlight.
 
@@ -197,7 +222,7 @@ docker exec -it wav2letter sh -c "cat /root/host/audio/google/hello.wav | /root/
 Detail of [wav2letter++ installation](https://github.com/facebookresearch/wav2letter/wiki#Installation) and [wav2letter++ inference](https://github.com/facebookresearch/wav2letter/wiki/Inference-Run-Examples)
 
 
-### Wit
+### 4. Wit
 
 [Wit](https://wit.ai/) gives an API interface for ASR. We use [pywit](https://github.com/wit-ai/pywit), the Python SDK for Wit. You need to create an WIT account to get access token.
 
