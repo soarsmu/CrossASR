@@ -31,14 +31,18 @@ def main(argv):
             upper_bound = int(arg)
         
     if tts != "" :
-        if output_dir != "" :
-            generateAudios(tts, output_dir, lower_bound, upper_bound)
-        else :
+        if output_dir == "" :
             print("Please specify the output folder location")
+        elif output_dir[-1] != "/" :
+            print("Please put backslash (/) in the end of the folder")
+        else :
+            generateAudios(tts, output_dir, lower_bound, upper_bound)
     else :
             print("Please specify the used TTS")
 
 def generateAudios(tts, output_dir, lower_bound=None, upper_bound=None) :
+    
+    output_dir = output_dir + tts + "/"
 
     if not os.path.exists(output_dir) :
         os.makedirs(output_dir)
@@ -62,8 +66,9 @@ def generateAudios(tts, output_dir, lower_bound=None, upper_bound=None) :
     
     for i in range(lower_bound, upper_bound) :
         text = corpus[i][:-1] # remove new line in the last sentence
-        fpath = output_dir + "/audio-%d.wav" % (i + 1)
+        fpath = output_dir + "audio-%d.wav" % (i + 1)
         if not os.path.exists(fpath) :
+            print("Processing text: %d" % (i + 1))
             utils.synthesizeSpeech(tts, text, fpath)
             # print(text)
 
