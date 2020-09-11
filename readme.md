@@ -47,7 +47,11 @@ pip install gTTS
 
 #### Trial
 ```
-mkdir audio/
+if [ ! -d "audio/" ]
+then 
+    mkdir audio
+fi
+
 mkdir audio/google/
 gtts-cli 'hello world google' --output audio/google/hello.mp3
 ffmpeg -i audio/google/hello.mp3  -acodec pcm_s16le -ac 1 -ar 16000 audio/google/hello.wav -y
@@ -232,7 +236,7 @@ Detail of [wav2letter++ installation](https://github.com/facebookresearch/wav2le
 
 #### install pywit
 ```
-pip install wit===5.8.1
+pip install wit===5.1.0
 ```
 
 #### Setup Wit access token
