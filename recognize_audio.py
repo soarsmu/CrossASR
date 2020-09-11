@@ -35,6 +35,10 @@ def main(argv):
             lower_bound = int(arg)
         elif opt in ("-u", "--upper-bound"):
             upper_bound = int(arg)
+            
+    if upper_bound < lower_bound :
+        print("Lower bound must be less than upper bound")
+        sys.exit()
     
     if tts == "" :
         print("Please specify the used TTS")
