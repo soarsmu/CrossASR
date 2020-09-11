@@ -25,13 +25,13 @@ sudo apt install python3-dev python3-pip python3-venv
 Create a new virtual environment by choosing a Python interpreter and making a ./env directory to hold it:
 
 ```
-python3 -m venv --system-site-packages ./env
+python3 -m venv --system-site-packages ~/./env
 ```
 
 Activate the virtual environment using a shell-specific command:
 
 ```
-source ./env/bin/activate  # sh, bash, or zsh
+source ~/./env/bin/activate  # sh, bash, or zsh
 ```
 
 
