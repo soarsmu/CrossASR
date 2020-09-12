@@ -342,6 +342,7 @@ This code will generate full europarl corpus `corpus/europarl-full.csv` and 20k 
 ```
 sh run_without_classifier.sh
 ```
+This script will generate audio files in the form of `audio/without_classifier/<tts>/audio-<id>.wav`. The transcription is saved at `result/without_classifier/<dataset name>/<tts>/<asr>/data.csv`. The statistic (number of failed test case, succuss test case, and indeterminable test case) is saved at `result/without_classifier/<dataset name>/<tts>/<asr>/data.csv`.
 
 ## Run With Classifier (RQ2)
 
@@ -359,6 +360,8 @@ python try_classifier.py
 ```
 sh run_with_classifier.sh
 ```
+
+This script will generate audio files in the form of `audio/with_classifier/<tts>/audio-<id>.wav`. The transcription is saved at `result/with_classifier/<dataset name>/<tts>/<asr>/data.csv`. The statistic (number of failed test case, succuss test case, and indeterminable test case) is saved at `result/with_classifier/<dataset name>/<tts>/<asr>/data.csv`.
 
 ## Process 20k Texts (RQ3)
 
