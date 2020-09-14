@@ -11,10 +11,6 @@ CORPUS_FPATH = "corpus/" + DATASET + "-20k.txt"
 
 INITIAL_SEED = 12345
 
-# linux base folder
-BASE_FOLDER = "/home/mhilmiasyrofi/Documents/cross-asr/"
-
-
 GOOGLE = "google"
 FESTIVAL = "festival"
 RV = "rv" # ResponsiveVoice
