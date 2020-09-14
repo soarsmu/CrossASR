@@ -244,3 +244,24 @@ def witRecognize(fpath):
 def isEmptyFile(fpath) :
     filesize = os.path.getsize(fpath)    
     return filesize == 0
+
+def readTranscription(fpath) :
+    file = open(fpath)
+    t = file.readlines()
+    file.close()
+
+    if len(t) == 0 :
+        return t[0]
+    print("There are more than one transcription")
+    sys.exit()
+
+
+def getTranscriptions(tts, id) :
+
+    transcriptions = {}
+    
+    for sr in constant.ASR :
+        fpath = "transcription/%s/%s/transcription-%d.txt" % (tts, sr, id)
+        transcriptions[sr] = readTranscription(fpath)
+
+    return transcriptions
