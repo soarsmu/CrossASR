@@ -172,6 +172,13 @@ def main(argv):
     APPROACH = "with_classifier"
 
     fix_corpus = getCorpus(constant.CORPUS_FPATH)
+    
+    print("Seed: ", random_seed)
+    print("Approach: ", APPROACH)
+    print("Corpus: ", constant.CORPUS_FPATH)
+    print("Number of Batch: ", n_batch)
+    print("Batch Size: ", batch_size)
+    print("Batch Time: ", batch_time)
 
     for tts in TTS :
         

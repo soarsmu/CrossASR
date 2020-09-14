@@ -54,13 +54,8 @@ def calculateAveragedResult(approach) :
 
             for random_seed in RANDOM_SEED:
 
-                folder = "result/%s/average/%s/%s/" % (approach, tts, sr)
-                if not os.path.exists(folder):
-                    os.makedirs(folder)
-
                 fpath = "result/%s/%s-%d/%s/%s/statistic.csv" % (approach,
                                                                 DATASET, random_seed, tts, sr)
-
                 b[random_seed] = pd.read_csv(fpath)
 
             a[sr] = b
@@ -84,7 +79,11 @@ def calculateAveragedResult(approach) :
 
     for tts in TTS:
         for sr in ASR:
-            fpath = "result/%s/%s-averaged/%s/%s/statistic.csv" % (approach, DATASET,tts, sr)
+            folder = "result/%s/%s-averaged/%s/%s/" % (approach, DATASET,tts, sr)
+            if not os.path.exists(folder):
+                    os.makedirs(folder)
+
+            fpath = folder + "statistic.csv"
             avg[tts][sr].to_csv(fpath, index=False, float_format='%.2f')
 
 
