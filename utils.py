@@ -250,7 +250,7 @@ def readTranscription(fpath) :
     t = file.readlines()
     file.close()
 
-    if len(t) == 0 :
+    if len(t) == 1 :
         return t[0]
     print("There are more than one transcription")
     sys.exit()

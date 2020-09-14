@@ -104,7 +104,7 @@ def main(argv):
 
     corpus = getCorpus(constant.CORPUS_FPATH)
 
-    print("TTS: ", TTS)
+    print("TTS: ", tts)
     print("Approach: ", APPROACH)
     print("Corpus: ", constant.CORPUS_FPATH)
 
@@ -125,11 +125,10 @@ def main(argv):
     if upper_bound > len(corpus) :
         print("Upper bound is greater than the size of corpus")
         sys.exit()
-    
-    for i in range(lower_bound, upper_bound) :
-        id = i + 1
-        instance = corpus[id]
-        transcriptions = utils.getTranscriptions(id)
+        
+        
+    for instance in corpus[lower_bound:upper_bound] :
+        transcriptions = utils.getTranscriptions(tts, instance["id"])
         case = getCase(instance["sentence"], transcriptions)
         for sr in ASR :
             data[sr] = data[sr].append(
