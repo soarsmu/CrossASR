@@ -10,6 +10,8 @@ To deal with the aforementioned challenge, in this work, we propose CrossASR, an
 We evaluated the performance of CrossASR on 20,000 English texts (i.e., sentences) in the [Europarl corpus](https://www.statmt.org/europarl/). We use 4 TTSes (i.e., [Google](https://cloud.google.com/text-to-speech), [ResponsiveVoice](https://responsivevoice.org/), [Festival](http://www.cstr.ed.ac.uk/projects/festival/), and [Espeak](http://espeak.sourceforge.net/)) and 4 ASRs (i.e., [Deepspeech](https://github.com/mozilla/DeepSpeech), [Deepspeech2](https://github.com/PaddlePaddle/DeepSpeech), [wav2letter++](https://github.com/facebookresearch/wav2letter), and [wit](https://wit.ai/)). We use more than one TTS to avoid bias that comes from a particular TTS.
 
 
+[CrossASR paper](https://drive.google.com/file/d/1k5CoBpzLuiu_EM21ukVyGSKGGQgeleWR/view?usp=sharing)
+
 ## Prepare Virtual Environment
 
 
