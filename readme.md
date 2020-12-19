@@ -1,4 +1,8 @@
-# CrossASR: Efficient Differential Testing of Automatic Speech Recognition via Text-To-Speech
+# CrossASR
+
+Code for ICSME 2020 "CrossASR: Efficient Differential Testing of Automatic Speech Recognition via Text-To-Speech" by [Muhammad Hilmi Asyrofi](https://www.linkedin.com/in/mhilmiasyrofi/), [Ferdian Thung](https://scholar.google.com/citations?hl=en&user=47okQ-UAAAAJ), [David Lo](https://scholar.google.com/citations?user=Ra4bt-oAAAAJ&hl=en), and [Lingxiao Jiang](https://scholar.google.com/citations?hl=en&user=0hssXLPZL2YC)
+
+[Paper PDF](https://drive.google.com/file/d/1k5CoBpzLuiu_EM21ukVyGSKGGQgeleWR/view?usp=sharing) | [DOI](https://ieeexplore.ieee.org/document/9240600)
 
 ### Overview
 
@@ -10,7 +14,7 @@ To deal with the aforementioned challenge, in this work, we propose CrossASR, an
 We evaluated the performance of CrossASR on 20,000 English texts (i.e., sentences) in the [Europarl corpus](https://www.statmt.org/europarl/). We use 4 TTSes (i.e., [Google](https://cloud.google.com/text-to-speech), [ResponsiveVoice](https://responsivevoice.org/), [Festival](http://www.cstr.ed.ac.uk/projects/festival/), and [Espeak](http://espeak.sourceforge.net/)) and 4 ASRs (i.e., [Deepspeech](https://github.com/mozilla/DeepSpeech), [Deepspeech2](https://github.com/PaddlePaddle/DeepSpeech), [wav2letter++](https://github.com/facebookresearch/wav2letter), and [wit](https://wit.ai/)). We use more than one TTS to avoid bias that comes from a particular TTS.
 
 
-[CrossASR paper](https://drive.google.com/file/d/1k5CoBpzLuiu_EM21ukVyGSKGGQgeleWR/view?usp=sharing)
+
 
 ## Prepare Virtual Environment
 
@@ -390,5 +394,17 @@ python recognize_audio.py --tts <tts name> --asr <asr name> --input-dir <input a
 ```
 python recognize_audio.py --tts google --asr paddledeepspeech --input-dir audio/data/ --output-dir transcription/ --lower-bound 0 --upper-bound 20000
 ```
+
+### Please Cite This!
+```
+@INPROCEEDINGS{Asyrofi2020CrossASR,  
+    author={M. H. {Asyrofi} and F. {Thung} and D. {Lo} and L. {Jiang}},  
+    booktitle={2020 IEEE International Conference on Software Maintenance and Evolution (ICSME)},
+    title={CrossASR: Efficient Differential Testing of Automatic Speech Recognition via Text-To-Speech},   
+    year={2020},  volume={},  number={},  
+    pages={640-650},  
+    doi={10.1109/ICSME46990.2020.00066}}
+```
+
 
 
