@@ -2,7 +2,7 @@
 
 Code for ICSME 2020 "CrossASR: Efficient Differential Testing of Automatic Speech Recognition via Text-To-Speech" by [Muhammad Hilmi Asyrofi](https://www.linkedin.com/in/mhilmiasyrofi/), [Ferdian Thung](https://scholar.google.com/citations?hl=en&user=47okQ-UAAAAJ), [David Lo](https://scholar.google.com/citations?user=Ra4bt-oAAAAJ&hl=en), and [Lingxiao Jiang](https://scholar.google.com/citations?hl=en&user=0hssXLPZL2YC)
 
-[Paper PDF](https://drive.google.com/file/d/1k5CoBpzLuiu_EM21ukVyGSKGGQgeleWR/view?usp=sharing) | [DOI](https://ieeexplore.ieee.org/document/9240600)
+[Paper PDF](https://mhilmiasyrofi.github.io/papers/CrossASR.pdf) | [DOI](https://ieeexplore.ieee.org/document/9240600)
 
 ### Overview
 
